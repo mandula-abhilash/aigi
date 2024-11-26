@@ -27,37 +27,57 @@ export const fieldSuggestions = async (req, res) => {
       {
         role: "user",
         content: `
-          Your goal is to suggest concise, meaningful, and context-aware completions for the field "${field}".
-          
-          When providing suggestions:
-          - Always return 3–5 options.
-          - If context is provided, tailor your suggestions to the given context to ensure relevance.
-          - Keep suggestions specific and avoid generic or repetitive outputs.
-          
-          ${
-            context
-              ? `Context provided: ${JSON.stringify(
-                  context
-                )}. Make suggestions specific to this context.`
-              : "No additional context is provided."
-          }
-          
-          Ensure your responses are helpful and appropriate for the task of gift idea generation.
-        `,
+            Provide 3-5 concise and meaningful suggestions for the field "${field}".
+            Suggestions must only include the possible values for this field and must not include the field name "${field}" in the output.
+            ${
+              context
+                ? `Context provided: ${JSON.stringify(
+                    context
+                  )}. Tailor the suggestions to this context.`
+                : "No additional context is provided."
+            }
+            If the current field value is partially filled (e.g., "${
+              context?.currentField || ""
+            }"), ensure all suggestions start with this value.
+          `,
       },
     ];
 
+    const response_format = {
+      type: "json_schema",
+      json_schema: {
+        name: "suggestions_schema",
+        strict: true,
+        schema: {
+          type: "object",
+          properties: {
+            field_name: {
+              type: "string",
+              description:
+                "The name of the field for which suggestions are provided.",
+            },
+            suggestions: {
+              type: "array",
+              description: "A list of suggested values for the field.",
+              items: { type: "string" },
+            },
+          },
+          required: ["field_name", "suggestions"],
+          additionalProperties: false,
+        },
+      },
+    };
+
     const completion = await openai.chat.completions.create({
-      model: process.env.OPEN_AI_MODEL, // Adjust model as needed
+      model: process.env.OPEN_AI_MODEL,
       messages,
+      response_format,
     });
 
-    const suggestions = completion.choices[0].message.content
-      .trim()
-      .split("\n")
-      .filter((suggestion) => suggestion);
+    // Parse the AI's output
+    let result = JSON.parse(completion.choices[0].message.content);
 
-    return res.json({ suggestions });
+    return res.json(result);
   } catch (error) {
     console.error("Error in fieldSuggestions:", error.message);
     res.status(500).json({ error: "Failed to fetch field suggestions." });
@@ -73,7 +93,6 @@ export const giftSuggestions = async (req, res) => {
   try {
     const { recipient, occasion, interests, budget } = req.body;
 
-    // Ensure at least critical fields are present
     if (!recipient && !occasion) {
       return res
         .status(400)
@@ -102,23 +121,46 @@ export const giftSuggestions = async (req, res) => {
               : "- Interests: Not specified"
           }
           ${budget ? `- Budget: ${budget}` : "- Budget: Not specified"}
-          
-          Please provide personalized and thoughtful gift suggestions. Tailor recommendations to the available details, and if some fields are missing, make reasonable assumptions to provide meaningful ideas. Return 5 suggestions.
+          Please provide 5 personalized gift suggestions that are creative, practical, and relevant.
         `,
       },
     ];
 
+    const response_format = {
+      type: "json_schema",
+      json_schema: {
+        name: "gift_suggestions_schema",
+        strict: true,
+        schema: {
+          type: "object",
+          properties: {
+            recipient: {
+              type: "string",
+              description: "The recipient of the gift.",
+            },
+            occasion: {
+              type: "string",
+              description: "The occasion for the gift.",
+            },
+            suggestions: {
+              type: "array",
+              description: "A list of gift ideas based on the provided input.",
+              items: { type: "string" },
+            },
+          },
+          required: ["recipient", "occasion", "suggestions"],
+          additionalProperties: false,
+        },
+      },
+    };
+
     const completion = await openai.chat.completions.create({
       model: process.env.OPEN_AI_MODEL,
       messages,
+      response_format,
     });
 
-    const suggestions = completion.choices[0].message.content
-      .trim()
-      .split("\n")
-      .filter((suggestion) => suggestion);
-
-    return res.json({ suggestions });
+    return res.json(JSON.parse(completion.choices[0].message.content));
   } catch (error) {
     console.error("Error in giftSuggestions:", error.message);
     res.status(500).json({ error: "Failed to fetch gift suggestions." });
