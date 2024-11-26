@@ -5,7 +5,9 @@ import compression from "compression";
 import morgan from "morgan";
 import { createAuthModule } from "visdak-sesam";
 import { sesamConfig } from "./config/sesam.js";
-import suggestionsRoute from "./routes/suggestions.js";
+
+import geoRouter from "./routes/geo.routes.js";
+import suggestionsRoute from "./routes/suggestions.routes.js";
 
 const PORT = process.env.PORT || 6000;
 
@@ -30,6 +32,9 @@ const startServer = async () => {
 
     // Mount the auth router
     app.use("/api/auth", authRouter);
+
+    // Mount the geo router
+    app.use("/api/geo", geoRouter);
 
     // Mount the suggestions route
     app.use("/api/suggestions", suggestionsRoute);
