@@ -8,21 +8,31 @@ const api = axios.create({
 });
 
 export const getFieldSuggestions = async (field, context = {}) => {
-  const response = await api.post("/api/suggestions/fields", {
-    field,
-    context,
-  });
-  return response.data.suggestions;
+  try {
+    const response = await api.post("/api/suggestions/fields", {
+      field,
+      context,
+    });
+    return response.data.field_name === field ? response.data.suggestions : [];
+  } catch (error) {
+    console.error("Error fetching field suggestions:", error);
+    return [];
+  }
 };
 
 export const getGiftSuggestions = async (formData) => {
-  const response = await api.post("/api/suggestions/gifts", {
-    recipient: formData.recipient,
-    occasion: formData.occasion,
-    interests: formData.interest,
-    budget: formData.maxBudget,
-  });
-  return response.data.suggestions;
+  try {
+    const response = await api.post("/api/suggestions/gifts", {
+      recipient: formData.recipient,
+      occasion: formData.occasion,
+      interests: formData.interests,
+      budget: formData.maxBudget,
+    });
+    return response.data.suggestions || [];
+  } catch (error) {
+    console.error("Error fetching gift suggestions:", error);
+    throw new Error("Failed to fetch gift suggestions");
+  }
 };
 
 export const getIpAddress = async () => {
