@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Search, X, Loader2, DollarSign, Plus } from "lucide-react";
 import { getFieldSuggestions, getGiftSuggestions } from "@/services/api";
+import GiftGrid from "@/components/suggestions/GiftGrid";
 
 const searchSchema = z.object({
   recipient: z.string().min(1, "Please specify who the gift is for"),
@@ -21,7 +22,7 @@ const searchSchema = z.object({
   maxBudget: z.number().min(1, "Please specify a maximum budget"),
 });
 
-export default function GiftSearchForm({ onSearch }) {
+export default function GiftSearchForm() {
   const [suggestions, setSuggestions] = useState({
     recipient: [],
     occasion: [],
@@ -161,7 +162,7 @@ export default function GiftSearchForm({ onSearch }) {
         ...data,
         interests,
       });
-      setResults(giftSuggestions); // Save the suggestions to the state
+      setResults(giftSuggestions);
     } catch (error) {
       toast({
         title: "Error",
@@ -181,11 +182,11 @@ export default function GiftSearchForm({ onSearch }) {
       occasion: [],
       interest: [],
     });
-    setResults([]); // Clear results on reset
+    setResults([]);
   };
 
   return (
-    <div>
+    <div className="max-w-6xl mx-auto px-4">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         <div className="text-center space-y-2">
           <h2 className="text-3xl font-bold tracking-tight">
@@ -397,30 +398,7 @@ export default function GiftSearchForm({ onSearch }) {
         )}
       </form>
 
-      {results.length > 0 && (
-        <div className="mt-8 space-y-4">
-          <h3 className="text-xl font-bold">Gift Suggestions</h3>
-          <ul className="space-y-4">
-            {results.map((suggestion, index) => (
-              <li
-                key={index}
-                className="p-4 border rounded-lg shadow-sm bg-white dark:bg-gray-800"
-              >
-                <p className="font-medium text-lg">{suggestion.gift}</p>
-                <p>
-                  <strong>Keywords:</strong> {suggestion.keywords}
-                </p>
-                <p>
-                  <strong>Demographic:</strong> {suggestion.demographic}
-                </p>
-                <p>
-                  <strong>Category:</strong> {suggestion.category}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <GiftGrid results={results} />
     </div>
   );
 }
