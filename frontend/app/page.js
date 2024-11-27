@@ -16,7 +16,7 @@ export default function HomePage() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative py-20 bg-gradient-to-b from-primary/5 to-background">
-        <div className="container mx-auto px-4">
+        <div className="mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
               Find the Perfect Gift with AI
@@ -49,7 +49,7 @@ export default function HomePage() {
 
       {/* Features Section */}
       <section className="py-20">
-        <div className="container mx-auto px-4">
+        <div className="mx-auto px-10">
           <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <Card>
@@ -90,7 +90,7 @@ export default function HomePage() {
 
       {/* CTA Section */}
       <section className="py-20 bg-primary/5">
-        <div className="container mx-auto px-4 text-center">
+        <div className="mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">
             Ready to Find the Perfect Gift?
           </h2>

@@ -17,7 +17,7 @@ export default function GiftGrid({ results }) {
   if (!results?.length) return null;
 
   return (
-    <div className="mt-12 container mx-auto px-4">
+    <div className="mt-12 mx-auto px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

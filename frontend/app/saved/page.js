@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import SavedProducts from '@/components/saved/SavedProducts';
-import SavedSearches from '@/components/saved/SavedSearches';
-import { BookmarkIcon, SearchIcon } from 'lucide-react';
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import SavedProducts from "@/components/saved/SavedProducts";
+import SavedSearches from "@/components/saved/SavedSearches";
+import { BookmarkIcon, SearchIcon } from "lucide-react";
 
 export default function SavedPage() {
-  const [activeTab, setActiveTab] = useState('products');
+  const [activeTab, setActiveTab] = useState("products");
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-8">Saved Items</h1>
-      
+
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-8">
           <TabsTrigger value="products" className="flex items-center gap-2">

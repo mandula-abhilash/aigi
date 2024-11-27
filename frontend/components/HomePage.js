@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import GiftSearchForm from '@/components/GiftSearchForm';
-import ProductGrid from '@/components/ProductGrid';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/components/ui/use-toast';
-import { GiftIcon } from 'lucide-react';
+import { useState } from "react";
+import GiftSearchForm from "@/components/GiftSearchForm";
+import ProductGrid from "@/components/ProductGrid";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
+import { GiftIcon } from "lucide-react";
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
@@ -20,17 +20,19 @@ export default function HomePage() {
       const transformedProducts = suggestions.map((suggestion, index) => ({
         id: index + 1,
         title: suggestion,
-        image: `https://source.unsplash.com/500x500/?gift,${encodeURIComponent(suggestion)}`,
+        image: `https://source.unsplash.com/500x500/?gift,${encodeURIComponent(
+          suggestion
+        )}`,
         price: "$49.99", // You might want to generate this based on budget
         link: "#",
       }));
-      
+
       setProducts(transformedProducts);
     } catch (error) {
       toast({
-        title: 'Error',
+        title: "Error",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -38,7 +40,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="mx-auto px-4 py-8">
       <header className="mb-12 text-center">
         <div className="flex items-center justify-center mb-4">
           <GiftIcon className="w-12 h-12 text-primary" />

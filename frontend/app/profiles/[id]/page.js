@@ -69,7 +69,7 @@ export default function ProfilePage() {
 
   if (!profile) {
     return (
-      <div className="container mx-auto px-4 py-8 text-center">
+      <div className="mx-auto px-4 py-8 text-center">
         <h1 className="text-2xl font-bold mb-4">Profile not found</h1>
         <p>The requested profile does not exist.</p>
       </div>
@@ -77,7 +77,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold mb-4">{profile.title}</h1>
         <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
