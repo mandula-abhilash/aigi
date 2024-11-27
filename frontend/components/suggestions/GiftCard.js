@@ -26,6 +26,13 @@ export default function GiftCard({ suggestion }) {
     });
   };
 
+  // Construct the Amazon affiliate link
+  const amazonSearchUrl = `https://${
+    process.env.NEXT_PUBLIC_AMAZON_DOMAIN
+  }/s?k=${encodeURIComponent(suggestion.keywords)}&tag=${
+    process.env.NEXT_PUBLIC_AMAZON_AFFILIATE_TAG
+  }`;
+
   return (
     <div className="w-full bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
       <div className="p-6">
@@ -80,10 +87,12 @@ export default function GiftCard({ suggestion }) {
         </div>
 
         <div className="mt-6 flex justify-end">
-          <Button variant="outline" size="sm" className="gap-2">
-            <ExternalLink className="h-4 w-4" />
-            View Details
-          </Button>
+          <a href={amazonSearchUrl} target="_blank" rel="noopener noreferrer">
+            <Button variant="outline" size="sm" className="gap-2">
+              <ExternalLink className="h-4 w-4" />
+              View on Amazon
+            </Button>
+          </a>
         </div>
       </div>
     </div>
