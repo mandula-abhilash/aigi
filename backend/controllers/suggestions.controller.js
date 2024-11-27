@@ -157,7 +157,7 @@ export const giftSuggestions = async (req, res) => {
       {
         role: "system",
         content:
-          "You are an AI that provides gift suggestions based on structured user input.",
+          "You are an AI that provides structured gift suggestions for users based on recipient details, occasion, interests, and budget. Your responses must strictly adhere to the provided JSON schema.",
       },
       {
         role: "user",
@@ -175,7 +175,7 @@ export const giftSuggestions = async (req, res) => {
               : "- Interests: Not specified"
           }
           ${budget ? `- Budget: ${budget}` : "- Budget: Not specified"}
-          Please provide 5 personalized gift suggestions that are creative, practical, and relevant.
+          Provide 5 personalized gift suggestions adhering to the specified JSON schema.
         `,
       },
     ];
@@ -186,36 +186,88 @@ export const giftSuggestions = async (req, res) => {
       response_format: {
         type: "json_schema",
         json_schema: {
-          name: "gift_suggestions_array",
+          name: "my_schema",
           strict: true,
           schema: {
             type: "object",
             properties: {
-              suggestions: {
-                type: "array",
-                description: "A list of personalized gift suggestions.",
-                items: {
-                  type: "string",
-                  description: "A suggested gift idea.",
+              name: {
+                type: "string",
+                description: "The name of the schema",
+              },
+              type: {
+                type: "string",
+                enum: [
+                  "object",
+                  "array",
+                  "string",
+                  "number",
+                  "boolean",
+                  "null",
+                ],
+              },
+              properties: {
+                type: "object",
+                properties: {
+                  suggestions: {
+                    type: "array",
+                    description:
+                      "A list of personalized gift suggestions with structured data.",
+                    items: {
+                      type: "object",
+                      properties: {
+                        gift: {
+                          type: "string",
+                          description: "A brief description of the gift.",
+                        },
+                        keywords: {
+                          type: "string",
+                          description:
+                            "Keywords for searching the gift on e-commerce platforms.",
+                        },
+                        demographic: {
+                          type: "string",
+                          description:
+                            "Target demographic details such as gender, age group, or relationship.",
+                        },
+                        category: {
+                          type: "string",
+                          description: "The suggested product category.",
+                        },
+                      },
+                      required: ["gift", "keywords", "demographic", "category"],
+                      additionalProperties: false,
+                    },
+                  },
                 },
+                required: ["suggestions"],
+                additionalProperties: false,
               },
             },
-            required: ["suggestions"],
+            $defs: {},
+            required: ["name", "type", "properties"],
             additionalProperties: false,
           },
         },
       },
       temperature: 0.7,
-      max_tokens: 200,
+      max_tokens: 300,
       top_p: 1,
       frequency_penalty: 0,
       presence_penalty: 0,
     });
 
-    // Parse and return structured gift suggestions
-    const suggestions = JSON.parse(
-      response.choices[0].message.content
-    ).suggestions;
+    // Parse the content as JSON
+    const parsedContent = JSON.parse(response.choices[0].message.content);
+
+    // Extract suggestions
+    const suggestions =
+      parsedContent.properties?.suggestions || parsedContent.suggestions;
+
+    if (!suggestions || !Array.isArray(suggestions)) {
+      throw new Error("Invalid response format from OpenAI");
+    }
+
     res.json(suggestions);
   } catch (error) {
     console.error("Error in giftSuggestions:", error.message);
