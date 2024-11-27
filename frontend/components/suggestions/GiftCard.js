@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
 
-export default function GiftCard({ suggestion, index }) {
+export default function GiftCard({ suggestion }) {
   const [isSaved, setIsSaved] = useState(false);
   const { toast } = useToast();
 
@@ -27,19 +27,12 @@ export default function GiftCard({ suggestion, index }) {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.1 }}
-      className="group relative overflow-hidden rounded-xl bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-all duration-300"
-    >
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
+    <div className="w-full bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
       <div className="p-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-4">
-              <Gift className="h-5 w-5 text-primary" />
+              {/* <Gift className="h-5 w-5 text-primary shrink-0" /> */}
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                 {suggestion.gift}
               </h3>
@@ -50,7 +43,11 @@ export default function GiftCard({ suggestion, index }) {
                 <Tag className="h-4 w-4 text-gray-500 mt-1 shrink-0" />
                 <div className="flex flex-wrap gap-1">
                   {suggestion.keywords.split(",").map((keyword, i) => (
-                    <Badge key={i} variant="secondary" className="text-xs">
+                    <Badge
+                      key={i}
+                      variant="secondary"
+                      className="text-xs px-2 py-0.5"
+                    >
                       {keyword.trim()}
                     </Badge>
                   ))}
@@ -58,12 +55,12 @@ export default function GiftCard({ suggestion, index }) {
               </div>
 
               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                <Users className="h-4 w-4" />
+                <Users className="h-4 w-4 shrink-0" />
                 <span>{suggestion.demographic}</span>
               </div>
 
               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                <FolderIcon className="h-4 w-4" />
+                <FolderIcon className="h-4 w-4 shrink-0" />
                 <span>{suggestion.category}</span>
               </div>
             </div>
@@ -89,6 +86,6 @@ export default function GiftCard({ suggestion, index }) {
           </Button>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

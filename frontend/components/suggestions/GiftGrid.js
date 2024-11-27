@@ -17,7 +17,7 @@ export default function GiftGrid({ results }) {
   if (!results?.length) return null;
 
   return (
-    <div className="mt-12">
+    <div className="mt-12 container mx-auto px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -35,10 +35,17 @@ export default function GiftGrid({ results }) {
         variants={container}
         initial="hidden"
         animate="show"
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4"
+        className="flex flex-col gap-4 max-w-3xl mx-auto"
       >
         {results.map((suggestion, index) => (
-          <GiftCard key={index} suggestion={suggestion} index={index} />
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            <GiftCard suggestion={suggestion} index={index} />
+          </motion.div>
         ))}
       </motion.div>
     </div>
