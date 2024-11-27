@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Search, X, TrendingUp, Clock } from "lucide-react";
 
 export default function SearchFilters({ onSearch, onFilter }) {
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeFilter, setActiveFilter] = useState("");
 
   const handleSearch = (e) => {
     const value = e.target.value;
@@ -17,13 +18,19 @@ export default function SearchFilters({ onSearch, onFilter }) {
     onSearch("");
   };
 
+  const handleFilter = (filterType) => {
+    const newFilter = activeFilter === filterType ? "" : filterType;
+    setActiveFilter(newFilter);
+    onFilter(newFilter);
+  };
+
   return (
     <div className="mb-8 space-y-4">
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
         <Input
           type="search"
-          placeholder="Search gift profiles..."
+          placeholder="Search by title, description, or interests..."
           value={searchTerm}
           onChange={handleSearch}
           className="pl-10 pr-10"
@@ -38,16 +45,24 @@ export default function SearchFilters({ onSearch, onFilter }) {
         )}
       </div>
 
-      <div className="flex gap-2 flex-wrap">
-        <Button variant="outline" size="sm" onClick={() => onFilter("popular")}>
-          Popular
+      <div className="flex gap-2">
+        <Button
+          variant={activeFilter === "popular" ? "default" : "outline"}
+          size="sm"
+          onClick={() => handleFilter("popular")}
+          className="gap-2"
+        >
+          <TrendingUp className="h-4 w-4" />
+          Most Popular
         </Button>
-        <Button variant="outline" size="sm" onClick={() => onFilter("recent")}>
-          Recent
-        </Button>
-        <Button variant="outline" size="sm" className="ml-auto">
-          <SlidersHorizontal className="h-4 w-4 mr-2" />
-          More Filters
+        <Button
+          variant={activeFilter === "recent" ? "default" : "outline"}
+          size="sm"
+          onClick={() => handleFilter("recent")}
+          className="gap-2"
+        >
+          <Clock className="h-4 w-4" />
+          Most Recent
         </Button>
       </div>
     </div>

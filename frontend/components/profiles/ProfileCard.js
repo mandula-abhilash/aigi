@@ -1,8 +1,8 @@
-import { motion } from 'framer-motion';
-import { ExternalLink, Gift, Tag, Heart } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import Link from 'next/link';
+import { motion } from "framer-motion";
+import { ExternalLink, Gift, Tag, Heart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 export default function ProfileCard({ profile }) {
   return (
@@ -35,7 +35,7 @@ export default function ProfileCard({ profile }) {
             <Badge
               key={index}
               variant="secondary"
-              className="bg-primary/10 text-primary hover:bg-primary/20"
+              className="bg-primary/10 text-primary hover:bg-primary/20 px-2"
             >
               {interest}
             </Badge>
