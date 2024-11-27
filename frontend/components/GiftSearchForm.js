@@ -188,16 +188,6 @@ export default function GiftSearchForm() {
   return (
     <div className="max-w-6xl mx-auto px-4">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        <div className="text-center space-y-2">
-          <h2 className="text-3xl font-bold tracking-tight">
-            Find the Perfect Gift
-          </h2>
-          <p className="text-muted-foreground">
-            Tell us about your gift recipient and we'll help you find something
-            special
-          </p>
-        </div>
-
         <div className="grid gap-6">
           <div className="space-y-2">
             <Label htmlFor="recipient">Who is this gift for?</Label>

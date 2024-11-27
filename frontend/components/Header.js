@@ -1,15 +1,23 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { useCurrency } from '@/contexts/CurrencyContext';
-import { Menu, X, Coins, LogOut, UserPlus, LogIn, BookmarkIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import TokenPurchaseModal from '@/components/TokenPurchaseModal';
-import MobileMenu from '@/components/MobileMenu';
-import AuthDialog from '@/components/auth/AuthDialog';
-import CurrencyModal from '@/components/CurrencyModal';
-import Link from 'next/link';
+import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import {
+  Menu,
+  X,
+  Coins,
+  LogOut,
+  UserPlus,
+  LogIn,
+  BookmarkIcon,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import TokenPurchaseModal from "@/components/TokenPurchaseModal";
+import MobileMenu from "@/components/MobileMenu";
+import AuthDialog from "@/components/auth/AuthDialog";
+import CurrencyModal from "@/components/CurrencyModal";
+import Link from "next/link";
 
 export default function Header() {
   const { user, tokens, logout } = useAuth();
@@ -18,7 +26,7 @@ export default function Header() {
   const [isTokenModalOpen, setIsTokenModalOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isCurrencyModalOpen, setIsCurrencyModalOpen] = useState(false);
-  const [initialAuthTab, setInitialAuthTab] = useState('login');
+  const [initialAuthTab, setInitialAuthTab] = useState("login");
 
   const openAuth = (tab) => {
     setInitialAuthTab(tab);
@@ -29,8 +37,11 @@ export default function Header() {
     <header className="bg-white dark:bg-gray-800 shadow-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">
-            Gift Finder
+          <Link
+            href="/"
+            className="text-xl font-bold text-gray-900 dark:text-white"
+          >
+            AIGI Gift Finder
           </Link>
 
           <nav className="hidden md:flex items-center space-x-4">
@@ -66,17 +77,17 @@ export default function Header() {
               </>
             ) : (
               <>
-                <Button 
+                <Button
                   variant="ghost"
-                  onClick={() => openAuth('login')}
+                  onClick={() => openAuth("login")}
                   className="flex items-center"
                 >
                   <LogIn className="w-4 h-4 mr-2" />
                   Sign In
                 </Button>
-                <Button 
+                <Button
                   variant="default"
-                  onClick={() => openAuth('register')}
+                  onClick={() => openAuth("register")}
                   className="flex items-center"
                 >
                   <UserPlus className="w-4 h-4 mr-2" />
