@@ -62,27 +62,33 @@ export default function GiftSearchForm({ onSearch }) {
       try {
         const formValues = getValues();
         const context = {
-          ...formValues,
+          recipient: formValues.recipient,
+          occasion: formValues.occasion,
           interests,
-          currentField: field,
+          maxBudget: formValues.maxBudget,
         };
 
         const fieldSuggestions = await getFieldSuggestions(field, context);
 
+        // Clean up suggestions and ensure they're unique
+        const cleanedSuggestions = [
+          ...new Set(fieldSuggestions.map((s) => s.trim())),
+        ];
+
         // For interest field, add "Create new" option if input doesn't match any suggestion
         if (field === "interest") {
           const currentValue = value.trim();
-          const exactMatch = fieldSuggestions.some(
+          const exactMatch = cleanedSuggestions.some(
             (suggestion) =>
               suggestion.toLowerCase() === currentValue.toLowerCase()
           );
 
           if (!exactMatch && currentValue) {
-            fieldSuggestions.push(`Create "${currentValue}"`);
+            cleanedSuggestions.push(`Create "${currentValue}"`);
           }
         }
 
-        setSuggestions((prev) => ({ ...prev, [field]: fieldSuggestions }));
+        setSuggestions((prev) => ({ ...prev, [field]: cleanedSuggestions }));
       } catch (error) {
         console.error("Failed to fetch suggestions:", error);
         toast({
@@ -125,10 +131,11 @@ export default function GiftSearchForm({ onSearch }) {
         if (!interests.includes(newInterest)) {
           setInterests([...interests, newInterest]);
         }
+        setValue("interest", "");
       } else if (!interests.includes(value)) {
         setInterests([...interests, value]);
+        setValue("interest", "");
       }
-      setValue("interest", "");
     } else {
       setValue(field, value);
     }

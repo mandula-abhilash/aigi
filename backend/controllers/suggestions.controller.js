@@ -6,119 +6,116 @@ const openai = new OpenAI({
 });
 
 /**
- * Generate suggestions for a specific field using OpenAI with a tailored prompt.
- * @param {string} field - The name of the field.
+ * Generate field-specific suggestions using OpenAI.
+ * @param {string} field - The field for which suggestions are needed (e.g., "recipient").
  * @param {Object} context - The context for generating suggestions.
  */
 const generateFieldSuggestions = async (field, context = {}) => {
-  let messages;
+  // Field-specific prompts and responses
+  const fieldPrompts = {
+    recipient: {
+      system:
+        "You are an assistant specializing in identifying suitable gift recipients for various occasions.",
+      user: `Provide 3-5 simple suggestions without numbering or labels. Examples include mother, friend, colleague.
+      ${
+        context.recipient
+          ? `If a recipient is partially provided, ensure all suggestions start with "${context.recipient}".`
+          : ""
+      }
+      Otherwise, provide general suggestions.`,
+    },
+    occasion: {
+      system:
+        "You are an assistant specializing in identifying appropriate gifting occasions.",
+      user: `Provide 3-5 simple suggestions for occasions. Examples include birthday, wedding, anniversary.
+      ${
+        context.occasion
+          ? `If an occasion is partially provided, ensure all suggestions start with "${context.occasion}".`
+          : ""
+      }
+      Otherwise, provide general suggestions.`,
+    },
+    interests: {
+      system:
+        "You are an assistant specializing in suggesting gift ideas based on interests.",
+      user: `Provide 3-5 simple suggestions for interests. Examples include music, sports, technology.
+      ${
+        context.interests?.length
+          ? `If interests are partially provided, ensure all suggestions start with "${context.interests.join(
+              ", "
+            )}".`
+          : ""
+      }
+      Otherwise, provide general suggestions.`,
+    },
+    budget: {
+      system:
+        "You are an assistant specializing in suggesting budget ranges for gifting.",
+      user: `Provide 3-5 simple budget range suggestions without numbering or labels. Examples include under $50, $50-$100, above $500.
+      ${
+        context.maxBudget
+          ? `Ensure the suggestions align with a maximum budget of "${context.maxBudget}".`
+          : ""
+      }
+      Otherwise, provide general suggestions.`,
+    },
+  };
 
-  // Field-specific prompts
-  switch (field) {
-    case "recipient":
-      messages = [
-        {
-          role: "system",
-          content:
-            "You are an assistant specializing in suggesting gift recipients.",
-        },
-        {
-          role: "user",
-          content: `
-            Provide 3-5 suggestions for the recipient of the gift.
-            Suggestions should include roles like 'mother', 'friend', or 'colleague'.
-            ${
-              context.currentField
-                ? `The current input is "${context.currentField}". Ensure suggestions start with this input.`
-                : "No partial input provided."
-            }
-          `,
-        },
-      ];
-      break;
-
-    case "occasion":
-      messages = [
-        {
-          role: "system",
-          content:
-            "You are an assistant specializing in suggesting occasions for gifting.",
-        },
-        {
-          role: "user",
-          content: `
-            Provide 3-5 suggestions for occasions like 'birthday', 'wedding', or 'anniversary'.
-            ${
-              context.currentField
-                ? `The current input is "${context.currentField}". Ensure suggestions start with this input.`
-                : "No partial input provided."
-            }
-          `,
-        },
-      ];
-      break;
-
-    case "interests":
-      messages = [
-        {
-          role: "system",
-          content:
-            "You are an assistant specializing in suggesting gift ideas based on interests.",
-        },
-        {
-          role: "user",
-          content: `
-            Provide 3-5 suggestions for interests like 'music', 'sports', or 'technology'.
-            ${
-              context.currentField
-                ? `The current input is "${context.currentField}". Ensure suggestions start with this input.`
-                : "No partial input provided."
-            }
-          `,
-        },
-      ];
-      break;
-
-    case "budget":
-      messages = [
-        {
-          role: "system",
-          content:
-            "You are an assistant specializing in suggesting budget ranges for gifting.",
-        },
-        {
-          role: "user",
-          content: `
-            Provide 3-5 budget suggestions in ranges like 'under $50', '$50-$100', or 'above $500'.
-            ${
-              context.currentField
-                ? `The current input is "${context.currentField}". Ensure suggestions start with this input.`
-                : "No partial input provided."
-            }
-          `,
-        },
-      ];
-      break;
-
-    default:
-      throw new Error("Invalid field provided.");
+  if (!fieldPrompts[field]) {
+    throw new Error("Invalid field provided.");
   }
 
-  const completion = await openai.chat.completions.create({
+  // Call OpenAI API with appropriate prompts
+  const response = await openai.chat.completions.create({
     model: process.env.OPEN_AI_MODEL,
-    messages,
+    messages: [
+      {
+        role: "system",
+        content: fieldPrompts[field].system,
+      },
+      {
+        role: "user",
+        content: fieldPrompts[field].user,
+      },
+    ],
+    response_format: {
+      type: "json_schema",
+      json_schema: {
+        name: `${field}_suggestions_array`,
+        strict: true,
+        schema: {
+          type: "object",
+          properties: {
+            suggestions: {
+              type: "array",
+              description: `List of suggestions for the field "${field}".`,
+              items: {
+                type: "string",
+                description: `A suggestion related to the "${field}" field.`,
+              },
+            },
+          },
+          required: ["suggestions"],
+          additionalProperties: false,
+        },
+      },
+    },
+    temperature: 0.7,
+    max_tokens: 200,
+    top_p: 1,
+    frequency_penalty: 0,
+    presence_penalty: 0,
   });
 
-  // Extract the suggestions from the AI's output
-  const suggestions = completion.choices[0].message.content
-    .split("\n")
-    .filter((line) => line.trim() !== "");
-
+  // Parse and return structured suggestions
+  const suggestions = JSON.parse(
+    response.choices[0].message.content
+  ).suggestions;
   return suggestions;
 };
 
 /**
- * Generic Controller for field-specific suggestions.
+ * Controller for field-specific suggestions.
  * @param {Object} req - Express request object.
  * @param {Object} res - Express response object.
  */
@@ -130,7 +127,7 @@ export const fieldSuggestions = async (req, res) => {
       return res.status(400).json({ error: "Field is required." });
     }
 
-    const suggestions = await generateFieldSuggestions(field, context);
+    const suggestions = await generateFieldSuggestions(field, context || {});
     res.json(suggestions);
   } catch (error) {
     console.error("Error in fieldSuggestions:", error.message);
@@ -180,41 +177,43 @@ export const giftSuggestions = async (req, res) => {
       },
     ];
 
-    const response_format = {
-      type: "json_schema",
-      json_schema: {
-        name: "gift_suggestions_schema",
-        strict: true,
-        schema: {
-          type: "object",
-          properties: {
-            recipient: {
-              type: "string",
-              description: "The recipient of the gift.",
-            },
-            occasion: {
-              type: "string",
-              description: "The occasion for the gift.",
-            },
-            suggestions: {
-              type: "array",
-              description: "A list of gift ideas based on the provided input.",
-              items: { type: "string" },
-            },
-          },
-          required: ["recipient", "occasion", "suggestions"],
-          additionalProperties: false,
-        },
-      },
-    };
-
-    const completion = await openai.chat.completions.create({
+    const response = await openai.chat.completions.create({
       model: process.env.OPEN_AI_MODEL,
       messages,
-      response_format,
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "gift_suggestions_array",
+          strict: true,
+          schema: {
+            type: "object",
+            properties: {
+              suggestions: {
+                type: "array",
+                description: "A list of personalized gift suggestions.",
+                items: {
+                  type: "string",
+                  description: "A suggested gift idea.",
+                },
+              },
+            },
+            required: ["suggestions"],
+            additionalProperties: false,
+          },
+        },
+      },
+      temperature: 0.7,
+      max_tokens: 200,
+      top_p: 1,
+      frequency_penalty: 0,
+      presence_penalty: 0,
     });
 
-    return res.json(JSON.parse(completion.choices[0].message.content));
+    // Parse and return structured gift suggestions
+    const suggestions = JSON.parse(
+      response.choices[0].message.content
+    ).suggestions;
+    res.json(suggestions);
   } catch (error) {
     console.error("Error in giftSuggestions:", error.message);
     res.status(500).json({ error: "Failed to fetch gift suggestions." });
