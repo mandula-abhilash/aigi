@@ -18,6 +18,7 @@ import MobileMenu from "@/components/MobileMenu";
 import AuthDialog from "@/components/auth/AuthDialog";
 import CurrencyModal from "@/components/CurrencyModal";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Header() {
   const { user, tokens, logout } = useAuth();
@@ -39,9 +40,15 @@ export default function Header() {
         <div className="flex items-center justify-between">
           <Link
             href="/"
-            className="text-xl font-bold text-gray-900 dark:text-white"
+            className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white"
           >
-            AIGI Gift Finder
+            <Image
+              src="/logo.png"
+              alt="AIGI Gift Finder"
+              width={32}
+              height={32}
+              className="w-24 h-8"
+            />
           </Link>
 
           <nav className="hidden md:flex items-center space-x-4">
