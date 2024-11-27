@@ -9,11 +9,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Search, X, Loader2, DollarSign, Plus } from "lucide-react";
 import { getFieldSuggestions, getGiftSuggestions } from "@/services/api";
 import GiftGrid from "@/components/suggestions/GiftGrid";
+import AIFormField from "@/components/form/AIFormField";
+import { Input } from "@/components/ui/input";
 
 const searchSchema = z.object({
   recipient: z.string().min(1, "Please specify who the gift is for"),
@@ -28,9 +28,13 @@ export default function GiftSearchForm() {
     occasion: [],
     interest: [],
   });
+  const [loadingStates, setLoadingStates] = useState({
+    recipient: false,
+    occasion: false,
+    interest: false,
+  });
   const [interests, setInterests] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [focusedField, setFocusedField] = useState(null);
   const { user } = useAuth();
   const { currencySymbol } = useCurrency();
   const { toast } = useToast();
@@ -58,10 +62,12 @@ export default function GiftSearchForm() {
     debounce(async (field, value) => {
       if (!value.trim()) {
         setSuggestions((prev) => ({ ...prev, [field]: [] }));
+        setLoadingStates((prev) => ({ ...prev, [field]: false }));
         return;
       }
 
       try {
+        setLoadingStates((prev) => ({ ...prev, [field]: true }));
         const formValues = getValues();
         const context = {
           recipient: formValues.recipient,
@@ -71,24 +77,10 @@ export default function GiftSearchForm() {
         };
 
         const fieldSuggestions = await getFieldSuggestions(field, context);
-
-        const cleanedSuggestions = [
-          ...new Set(fieldSuggestions.map((s) => s.trim())),
-        ];
-
-        if (field === "interest") {
-          const currentValue = value.trim();
-          const exactMatch = cleanedSuggestions.some(
-            (suggestion) =>
-              suggestion.toLowerCase() === currentValue.toLowerCase()
-          );
-
-          if (!exactMatch && currentValue) {
-            cleanedSuggestions.push(`Create "${currentValue}"`);
-          }
-        }
-
-        setSuggestions((prev) => ({ ...prev, [field]: cleanedSuggestions }));
+        setSuggestions((prev) => ({
+          ...prev,
+          [field]: fieldSuggestions,
+        }));
       } catch (error) {
         console.error("Failed to fetch suggestions:", error);
         toast({
@@ -96,6 +88,8 @@ export default function GiftSearchForm() {
           description: "Failed to fetch suggestions",
           variant: "destructive",
         });
+      } finally {
+        setLoadingStates((prev) => ({ ...prev, [field]: false }));
       }
     }, 300),
     [interests]
@@ -121,25 +115,6 @@ export default function GiftSearchForm() {
       e.preventDefault();
       addCustomInterest();
     }
-  };
-
-  const handleSuggestionClick = (field, value) => {
-    if (field === "interest") {
-      // Handle "Create new" option
-      if (value.startsWith('Create "')) {
-        const newInterest = value.slice(8, -1); // Extract the actual value from 'Create "value"'
-        if (!interests.includes(newInterest)) {
-          setInterests([...interests, newInterest]);
-        }
-        setValue("interest", "");
-      } else if (!interests.includes(value)) {
-        setInterests([...interests, value]);
-        setValue("interest", "");
-      }
-    } else {
-      setValue(field, value);
-    }
-    setSuggestions((prev) => ({ ...prev, [field]: [] }));
   };
 
   const removeInterest = (interest) => {
@@ -189,131 +164,49 @@ export default function GiftSearchForm() {
     <div className="max-w-6xl mx-auto px-4">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
         <div className="grid gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="recipient">Who is this gift for?</Label>
-            <div className="relative">
-              <Input
-                id="recipient"
-                placeholder="e.g., Mom, Friend, Colleague"
-                {...register("recipient")}
-                onChange={handleInputChange("recipient")}
-                onFocus={() => setFocusedField("recipient")}
-                onBlur={() => setTimeout(() => setFocusedField(null), 200)}
-                className={errors.recipient ? "border-red-500" : ""}
-              />
-              {suggestions.recipient.length > 0 &&
-                focusedField === "recipient" && (
-                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-                    {suggestions.recipient.map((suggestion, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() =>
-                          handleSuggestionClick("recipient", suggestion)
-                        }
-                        className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg"
-                      >
-                        {suggestion}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              {errors.recipient && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.recipient.message}
-                </p>
-              )}
-            </div>
-          </div>
+          <AIFormField
+            id="recipient"
+            label="Who is this gift for?"
+            value={watch("recipient")}
+            onChange={handleInputChange("recipient")}
+            onSuggestionClick={(value) => setValue("recipient", value)}
+            suggestions={suggestions.recipient}
+            loading={loadingStates.recipient}
+            error={errors.recipient?.message}
+            placeholder="e.g., Mom, Friend, Colleague"
+          />
+
+          <AIFormField
+            id="occasion"
+            label="What's the occasion?"
+            value={watch("occasion")}
+            onChange={handleInputChange("occasion")}
+            onSuggestionClick={(value) => setValue("occasion", value)}
+            suggestions={suggestions.occasion}
+            loading={loadingStates.occasion}
+            error={errors.occasion?.message}
+            placeholder="e.g., Birthday, Anniversary"
+          />
 
           <div className="space-y-2">
-            <Label htmlFor="occasion">What's the occasion?</Label>
-            <div className="relative">
-              <Input
-                id="occasion"
-                placeholder="e.g., Birthday, Anniversary"
-                {...register("occasion")}
-                onChange={handleInputChange("occasion")}
-                onFocus={() => setFocusedField("occasion")}
-                onBlur={() => setTimeout(() => setFocusedField(null), 200)}
-                className={errors.occasion ? "border-red-500" : ""}
-              />
-              {suggestions.occasion.length > 0 &&
-                focusedField === "occasion" && (
-                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-                    {suggestions.occasion.map((suggestion, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() =>
-                          handleSuggestionClick("occasion", suggestion)
-                        }
-                        className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg"
-                      >
-                        {suggestion}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              {errors.occasion && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.occasion.message}
-                </p>
-              )}
-            </div>
-          </div>
+            <AIFormField
+              id="interest"
+              label="What are their interests?"
+              value={watch("interest")}
+              onChange={handleInputChange("interest")}
+              onSuggestionClick={(value) => {
+                if (!interests.includes(value)) {
+                  setInterests([...interests, value]);
+                  setValue("interest", "");
+                }
+              }}
+              suggestions={suggestions.interest}
+              loading={loadingStates.interest}
+              error={errors.interest?.message}
+              placeholder="e.g., Reading, Cooking, Gaming"
+              onKeyDown={handleInterestKeyDown}
+            />
 
-          <div className="space-y-2">
-            <Label htmlFor="interest">What are their interests?</Label>
-            <div className="relative">
-              <div className="flex gap-2">
-                <Input
-                  id="interest"
-                  placeholder="e.g., Reading, Cooking, Gaming"
-                  {...register("interest")}
-                  value={watch("interest")}
-                  onChange={handleInputChange("interest")}
-                  onKeyDown={handleInterestKeyDown}
-                  onFocus={() => setFocusedField("interest")}
-                  onBlur={() => setTimeout(() => setFocusedField(null), 200)}
-                  className={errors.interest ? "border-red-500" : ""}
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={addCustomInterest}
-                  disabled={!watch("interest").trim()}
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-              {suggestions.interest.length > 0 &&
-                focusedField === "interest" && (
-                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-                    {suggestions.interest.map((suggestion, index) => (
-                      <button
-                        key={index}
-                        type="button"
-                        onClick={() =>
-                          handleSuggestionClick("interest", suggestion)
-                        }
-                        className={`w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg ${
-                          suggestion.startsWith('Create "')
-                            ? "text-primary font-medium"
-                            : ""
-                        }`}
-                      >
-                        {suggestion}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              {interests.length === 0 && (
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Press Enter or click the + button to add a custom interest
-                </p>
-              )}
-            </div>
             {interests.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
                 {interests.map((interest, index) => (
@@ -336,16 +229,18 @@ export default function GiftSearchForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="maxBudget">Maximum Budget ({currencySymbol})</Label>
+            <label htmlFor="maxBudget" className="text-sm font-medium">
+              Maximum Budget ({currencySymbol})
+            </label>
             <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+              {/* <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" /> */}
               <Input
                 id="maxBudget"
                 type="number"
                 min="1"
                 placeholder="Enter maximum budget"
                 {...register("maxBudget", { valueAsNumber: true })}
-                className={`pl-8 ${errors.maxBudget ? "border-red-500" : ""}`}
+                className={`pl-4 ${errors.maxBudget ? "border-red-500" : ""}`}
               />
               {errors.maxBudget && (
                 <p className="mt-1 text-sm text-red-500">
