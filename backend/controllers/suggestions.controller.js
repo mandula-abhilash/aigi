@@ -35,15 +35,13 @@ const generateFieldSuggestions = async (field, context = {}) => {
       }
       Otherwise, provide general suggestions.`,
     },
-    interests: {
+    interest: {
       system:
-        "You are an assistant specializing in suggesting gift ideas based on interests.",
-      user: `Provide 3-5 simple suggestions for interests. Examples include music, sports, technology.
+        "You are an assistant specializing in suggesting interests and hobbies.",
+      user: `Provide 3-5 simple suggestions for interests or hobbies. Examples include reading, cooking, gaming.
       ${
-        context.interests?.length
-          ? `If interests are partially provided, ensure all suggestions start with "${context.interests.join(
-              ", "
-            )}".`
+        context.interest
+          ? `If an interest is partially provided, ensure all suggestions start with "${context.interest}".`
           : ""
       }
       Otherwise, provide general suggestions.`,
@@ -127,7 +125,12 @@ export const fieldSuggestions = async (req, res) => {
       return res.status(400).json({ error: "Field is required." });
     }
 
-    const suggestions = await generateFieldSuggestions(field, context || {});
+    // Handle 'interests' field as 'interest' for suggestions
+    const normalizedField = field === "interests" ? "interest" : field;
+    const suggestions = await generateFieldSuggestions(
+      normalizedField,
+      context || {}
+    );
     res.json(suggestions);
   } catch (error) {
     console.error("Error in fieldSuggestions:", error.message);

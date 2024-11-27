@@ -8,12 +8,15 @@ const api = axios.create({
 });
 
 export const getFieldSuggestions = async (field, context = {}) => {
-  console.log(field);
   try {
+    // Normalize the field name for interests
+    const normalizedField = field === "interest" ? "interest" : field;
+
     const response = await api.post("/api/suggestions/fields", {
-      field,
+      field: normalizedField,
       context,
     });
+
     // Clean up suggestions - split if it's a string and filter empty values
     const suggestions = Array.isArray(response.data)
       ? response.data
@@ -34,7 +37,7 @@ export const getGiftSuggestions = async (formData) => {
       interests: formData.interests,
       budget: formData.maxBudget,
     });
-    return response.data.suggestions || [];
+    return response.data || [];
   } catch (error) {
     console.error("Error fetching gift suggestions:", error);
     throw new Error("Failed to fetch gift suggestions");

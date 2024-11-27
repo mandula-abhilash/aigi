@@ -64,7 +64,7 @@ export default function GiftSearchForm({ onSearch }) {
         const context = {
           recipient: formValues.recipient,
           occasion: formValues.occasion,
-          interests,
+          interest: formValues.interest,
           maxBudget: formValues.maxBudget,
         };
 
