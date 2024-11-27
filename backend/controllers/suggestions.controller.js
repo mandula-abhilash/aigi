@@ -2,11 +2,123 @@ import OpenAI from "openai";
 
 // Initialize OpenAI API client
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // Ensure this is set in your environment
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 /**
- * Controller for field suggestions (Next Input Predictions).
+ * Generate suggestions for a specific field using OpenAI with a tailored prompt.
+ * @param {string} field - The name of the field.
+ * @param {Object} context - The context for generating suggestions.
+ */
+const generateFieldSuggestions = async (field, context = {}) => {
+  let messages;
+
+  // Field-specific prompts
+  switch (field) {
+    case "recipient":
+      messages = [
+        {
+          role: "system",
+          content:
+            "You are an assistant specializing in suggesting gift recipients.",
+        },
+        {
+          role: "user",
+          content: `
+            Provide 3-5 suggestions for the recipient of the gift.
+            Suggestions should include roles like 'mother', 'friend', or 'colleague'.
+            ${
+              context.currentField
+                ? `The current input is "${context.currentField}". Ensure suggestions start with this input.`
+                : "No partial input provided."
+            }
+          `,
+        },
+      ];
+      break;
+
+    case "occasion":
+      messages = [
+        {
+          role: "system",
+          content:
+            "You are an assistant specializing in suggesting occasions for gifting.",
+        },
+        {
+          role: "user",
+          content: `
+            Provide 3-5 suggestions for occasions like 'birthday', 'wedding', or 'anniversary'.
+            ${
+              context.currentField
+                ? `The current input is "${context.currentField}". Ensure suggestions start with this input.`
+                : "No partial input provided."
+            }
+          `,
+        },
+      ];
+      break;
+
+    case "interests":
+      messages = [
+        {
+          role: "system",
+          content:
+            "You are an assistant specializing in suggesting gift ideas based on interests.",
+        },
+        {
+          role: "user",
+          content: `
+            Provide 3-5 suggestions for interests like 'music', 'sports', or 'technology'.
+            ${
+              context.currentField
+                ? `The current input is "${context.currentField}". Ensure suggestions start with this input.`
+                : "No partial input provided."
+            }
+          `,
+        },
+      ];
+      break;
+
+    case "budget":
+      messages = [
+        {
+          role: "system",
+          content:
+            "You are an assistant specializing in suggesting budget ranges for gifting.",
+        },
+        {
+          role: "user",
+          content: `
+            Provide 3-5 budget suggestions in ranges like 'under $50', '$50-$100', or 'above $500'.
+            ${
+              context.currentField
+                ? `The current input is "${context.currentField}". Ensure suggestions start with this input.`
+                : "No partial input provided."
+            }
+          `,
+        },
+      ];
+      break;
+
+    default:
+      throw new Error("Invalid field provided.");
+  }
+
+  const completion = await openai.chat.completions.create({
+    model: process.env.OPEN_AI_MODEL,
+    messages,
+  });
+
+  // Extract the suggestions from the AI's output
+  const suggestions = completion.choices[0].message.content
+    .split("\n")
+    .filter((line) => line.trim() !== "");
+
+  return suggestions;
+};
+
+/**
+ * Generic Controller for field-specific suggestions.
  * @param {Object} req - Express request object.
  * @param {Object} res - Express response object.
  */
@@ -18,66 +130,8 @@ export const fieldSuggestions = async (req, res) => {
       return res.status(400).json({ error: "Field is required." });
     }
 
-    const messages = [
-      {
-        role: "system",
-        content:
-          "You are an intelligent assistant designed to help users fill out a form for finding personalized gift ideas.",
-      },
-      {
-        role: "user",
-        content: `
-            Provide 3-5 concise and meaningful suggestions for the field "${field}".
-            Suggestions must only include the possible values for this field and must not include the field name "${field}" in the output.
-            ${
-              context
-                ? `Context provided: ${JSON.stringify(
-                    context
-                  )}. Tailor the suggestions to this context.`
-                : "No additional context is provided."
-            }
-            If the current field value is partially filled (e.g., "${
-              context?.currentField || ""
-            }"), ensure all suggestions start with this value.
-          `,
-      },
-    ];
-
-    const response_format = {
-      type: "json_schema",
-      json_schema: {
-        name: "suggestions_schema",
-        strict: true,
-        schema: {
-          type: "object",
-          properties: {
-            field_name: {
-              type: "string",
-              description:
-                "The name of the field for which suggestions are provided.",
-            },
-            suggestions: {
-              type: "array",
-              description: "A list of suggested values for the field.",
-              items: { type: "string" },
-            },
-          },
-          required: ["field_name", "suggestions"],
-          additionalProperties: false,
-        },
-      },
-    };
-
-    const completion = await openai.chat.completions.create({
-      model: process.env.OPEN_AI_MODEL,
-      messages,
-      response_format,
-    });
-
-    // Parse the AI's output
-    let result = JSON.parse(completion.choices[0].message.content);
-
-    return res.json(result);
+    const suggestions = await generateFieldSuggestions(field, context);
+    res.json(suggestions);
   } catch (error) {
     console.error("Error in fieldSuggestions:", error.message);
     res.status(500).json({ error: "Failed to fetch field suggestions." });

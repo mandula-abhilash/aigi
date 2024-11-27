@@ -17,7 +17,7 @@ import { getFieldSuggestions, getGiftSuggestions } from "@/services/api";
 const searchSchema = z.object({
   recipient: z.string().min(1, "Please specify who the gift is for"),
   occasion: z.string().min(1, "Please specify the occasion"),
-  interests: z.array(z.string()).min(1, "Please specify at least one interest"),
+  interest: z.string(),
   maxBudget: z.number().min(1, "Please specify a maximum budget"),
 });
 
@@ -27,9 +27,9 @@ export default function GiftSearchForm({ onSearch }) {
     occasion: [],
     interest: [],
   });
+  const [interests, setInterests] = useState([]);
   const [loading, setLoading] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
-  const [currentInterest, setCurrentInterest] = useState("");
   const { user } = useAuth();
   const { currencySymbol } = useCurrency();
   const { toast } = useToast();
@@ -39,14 +39,15 @@ export default function GiftSearchForm({ onSearch }) {
     handleSubmit,
     formState: { errors },
     setValue,
-    getValues,
     reset,
+    getValues,
+    watch,
   } = useForm({
     resolver: zodResolver(searchSchema),
     defaultValues: {
       recipient: "",
       occasion: "",
-      interests: [],
+      interest: "",
       maxBudget: 100,
     },
   });
@@ -59,14 +60,28 @@ export default function GiftSearchForm({ onSearch }) {
       }
 
       try {
-        // Get current form values for context
         const formValues = getValues();
         const context = {
           ...formValues,
+          interests,
           currentField: field,
         };
 
         const fieldSuggestions = await getFieldSuggestions(field, context);
+
+        // For interest field, add "Create new" option if input doesn't match any suggestion
+        if (field === "interest") {
+          const currentValue = value.trim();
+          const exactMatch = fieldSuggestions.some(
+            (suggestion) =>
+              suggestion.toLowerCase() === currentValue.toLowerCase()
+          );
+
+          if (!exactMatch && currentValue) {
+            fieldSuggestions.push(`Create "${currentValue}"`);
+          }
+        }
+
         setSuggestions((prev) => ({ ...prev, [field]: fieldSuggestions }));
       } catch (error) {
         console.error("Failed to fetch suggestions:", error);
@@ -77,56 +92,69 @@ export default function GiftSearchForm({ onSearch }) {
         });
       }
     }, 300),
-    [getValues, toast]
+    [interests]
   );
 
   const handleInputChange = (field) => (e) => {
     const value = e.target.value;
-    if (field === "interest") {
-      setCurrentInterest(value);
-    } else {
-      setValue(field, value);
-    }
+    setValue(field, value);
     debouncedFetch(field, value);
+  };
+
+  const addCustomInterest = () => {
+    const interest = getValues("interest").trim();
+    if (interest && !interests.includes(interest)) {
+      setInterests([...interests, interest]);
+      setValue("interest", "");
+      setSuggestions((prev) => ({ ...prev, interest: [] }));
+    }
+  };
+
+  const handleInterestKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addCustomInterest();
+    }
   };
 
   const handleSuggestionClick = (field, value) => {
     if (field === "interest") {
-      const currentInterests = getValues("interests") || [];
-      if (!currentInterests.includes(value)) {
-        setValue("interests", [...currentInterests, value]);
-        setCurrentInterest("");
-        setSuggestions((prev) => ({ ...prev, interest: [] }));
+      // Handle "Create new" option
+      if (value.startsWith('Create "')) {
+        const newInterest = value.slice(8, -1); // Extract the actual value from 'Create "value"'
+        if (!interests.includes(newInterest)) {
+          setInterests([...interests, newInterest]);
+        }
+      } else if (!interests.includes(value)) {
+        setInterests([...interests, value]);
       }
+      setValue("interest", "");
     } else {
       setValue(field, value);
-      setSuggestions((prev) => ({ ...prev, [field]: [] }));
     }
+    setSuggestions((prev) => ({ ...prev, [field]: [] }));
   };
 
-  const handleAddInterest = () => {
-    if (currentInterest.trim()) {
-      const currentInterests = getValues("interests") || [];
-      if (!currentInterests.includes(currentInterest)) {
-        setValue("interests", [...currentInterests, currentInterest.trim()]);
-        setCurrentInterest("");
-        setSuggestions((prev) => ({ ...prev, interest: [] }));
-      }
-    }
-  };
-
-  const handleRemoveInterest = (interestToRemove) => {
-    const currentInterests = getValues("interests");
-    setValue(
-      "interests",
-      currentInterests.filter((interest) => interest !== interestToRemove)
-    );
+  const removeInterest = (interest) => {
+    setInterests(interests.filter((i) => i !== interest));
   };
 
   const onSubmit = async (data) => {
+    if (interests.length === 0) {
+      toast({
+        title: "Error",
+        description: "Please add at least one interest",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       setLoading(true);
-      const suggestions = await getGiftSuggestions(data);
+      const suggestions = await getGiftSuggestions({
+        ...data,
+        interests,
+      });
       onSearch(suggestions);
     } catch (error) {
       toast({
@@ -141,7 +169,7 @@ export default function GiftSearchForm({ onSearch }) {
 
   const handleClear = () => {
     reset();
-    setCurrentInterest("");
+    setInterests([]);
     setSuggestions({
       recipient: [],
       occasion: [],
@@ -237,73 +265,73 @@ export default function GiftSearchForm({ onSearch }) {
 
         <div className="space-y-2">
           <Label htmlFor="interest">What are their interests?</Label>
-          <div className="space-y-2">
+          <div className="relative">
             <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Input
-                  id="interest"
-                  placeholder="Add an interest"
-                  value={currentInterest}
-                  onChange={handleInputChange("interest")}
-                  onFocus={() => setFocusedField("interest")}
-                  onBlur={() => setTimeout(() => setFocusedField(null), 200)}
-                  onKeyPress={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault();
-                      handleAddInterest();
-                    }
-                  }}
-                />
-                {suggestions.interest.length > 0 &&
-                  focusedField === "interest" && (
-                    <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-                      {suggestions.interest.map((suggestion, index) => (
-                        <button
-                          key={index}
-                          type="button"
-                          onClick={() =>
-                            handleSuggestionClick("interest", suggestion)
-                          }
-                          className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg"
-                        >
-                          {suggestion}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-              </div>
+              <Input
+                id="interest"
+                placeholder="e.g., Reading, Cooking, Gaming"
+                {...register("interest")}
+                value={watch("interest")}
+                onChange={handleInputChange("interest")}
+                onKeyDown={handleInterestKeyDown}
+                onFocus={() => setFocusedField("interest")}
+                onBlur={() => setTimeout(() => setFocusedField(null), 200)}
+                className={errors.interest ? "border-red-500" : ""}
+              />
               <Button
                 type="button"
-                onClick={handleAddInterest}
-                disabled={!currentInterest.trim()}
+                variant="outline"
+                onClick={addCustomInterest}
+                disabled={!watch("interest").trim()}
               >
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
-
-            <div className="flex flex-wrap gap-2">
-              {getValues("interests")?.map((interest, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-1 bg-primary/10 text-primary rounded-full px-3 py-1"
-                >
-                  <span>{interest}</span>
+            {suggestions.interest.length > 0 && focusedField === "interest" && (
+              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+                {suggestions.interest.map((suggestion, index) => (
                   <button
+                    key={index}
                     type="button"
-                    onClick={() => handleRemoveInterest(interest)}
-                    className="hover:text-red-500"
+                    onClick={() =>
+                      handleSuggestionClick("interest", suggestion)
+                    }
+                    className={`w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 first:rounded-t-lg last:rounded-b-lg ${
+                      suggestion.startsWith('Create "')
+                        ? "text-primary font-medium"
+                        : ""
+                    }`}
                   >
-                    <X className="h-4 w-4" />
+                    {suggestion}
                   </button>
-                </div>
-              ))}
-            </div>
-            {errors.interests && (
-              <p className="mt-1 text-sm text-red-500">
-                {errors.interests.message}
+                ))}
+              </div>
+            )}
+            {interests.length === 0 && (
+              <p className="mt-1 text-sm text-muted-foreground">
+                Press Enter or click the + button to add a custom interest
               </p>
             )}
           </div>
+          {interests.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {interests.map((interest, index) => (
+                <span
+                  key={index}
+                  className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-primary/10 text-primary"
+                >
+                  {interest}
+                  <button
+                    type="button"
+                    onClick={() => removeInterest(interest)}
+                    className="ml-2 hover:text-primary/70"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="space-y-2">
