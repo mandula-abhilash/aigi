@@ -40,14 +40,14 @@ export default function Header() {
         <div className="flex items-center justify-between">
           <Link
             href="/"
-            className="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-white"
+            className="flex items-center gap-2 text-xl shadow-2xl font-bold text-gray-900 dark:text-white"
           >
             <Image
               src="/logo.png"
               alt="AIGI Gift Finder"
               width={32}
               height={32}
-              className="w-24 h-8"
+              className="w-24 h-12"
             />
           </Link>
 
