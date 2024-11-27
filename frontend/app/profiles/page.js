@@ -1,83 +1,90 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-
-const profiles = [
-  {
-    id: "husband-birthday-jogging",
-    title: "Gifts for Husband on His Birthday (Likes Jogging)",
-    description: "Perfect gifts for the fitness enthusiast husband",
-    interests: ["Jogging", "Fitness", "Sports"],
-  },
-  {
-    id: "grandmother-thanksgiving-dogs",
-    title: "Gifts for Grandmother on Thanksgiving (Loves Dogs)",
-    description: "Thoughtful gifts for the dog-loving grandmother",
-    interests: ["Dogs", "Pets", "Family"],
-  },
-  // Add more profiles as needed
-];
+import { useState, useEffect } from "react";
+import { getGiftProfiles } from "@/services/profiles";
+import SearchFilters from "@/components/profiles/SearchFilters";
+import { motion } from "framer-motion";
+import ProfileGrid from "@/components/profiles/ProfileGrid";
 
 export default function ProfilesPage() {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [profiles, setProfiles] = useState([]);
+  const [filteredProfiles, setFilteredProfiles] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredProfiles = profiles.filter(
-    (profile) =>
-      profile.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      profile.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      profile.interests.some((interest) =>
-        interest.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-  );
+  useEffect(() => {
+    fetchProfiles();
+  }, []);
+
+  const fetchProfiles = async () => {
+    try {
+      setLoading(true);
+      const data = await getGiftProfiles();
+      setProfiles(data);
+      setFilteredProfiles(data);
+    } catch (error) {
+      console.error("Failed to fetch profiles:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = (searchTerm) => {
+    if (!searchTerm.trim()) {
+      setFilteredProfiles(profiles);
+      return;
+    }
+
+    const filtered = profiles.filter(
+      (profile) =>
+        profile.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        profile.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        profile.interests.some((interest) =>
+          interest.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+    );
+    setFilteredProfiles(filtered);
+  };
+
+  const handleFilter = (filterType) => {
+    let filtered = [...profiles];
+    switch (filterType) {
+      case "popular":
+        filtered.sort((a, b) => b.views - a.views);
+        break;
+      case "recent":
+        filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        break;
+      default:
+        break;
+    }
+    setFilteredProfiles(filtered);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-center mb-8">Gift Profiles</h1>
-
-      <div className="max-w-xl mx-auto mb-8">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-          <Input
-            type="search"
-            placeholder="Search profiles..."
-            className="pl-10"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-6xl mx-auto mb-32"
+      >
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4">Gift Profiles</h1>
+          <p className="text-lg text-gray-600 dark:text-gray-400">
+            Browse our curated collection of gift profiles for every occasion
+          </p>
         </div>
-      </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {filteredProfiles.map((profile) => (
-          <Link key={profile.id} href={`/profiles/${profile.id}`}>
-            <Card className="h-full transition-transform hover:scale-105">
-              <CardHeader>
-                <CardTitle>{profile.title}</CardTitle>
-                <CardDescription>{profile.description}</CardDescription>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {profile.interests.map((interest) => (
-                    <span
-                      key={interest}
-                      className="px-2 py-1 text-xs rounded-full bg-primary/10 text-primary"
-                    >
-                      {interest}
-                    </span>
-                  ))}
-                </div>
-              </CardHeader>
-            </Card>
-          </Link>
-        ))}
-      </div>
+        <SearchFilters onSearch={handleSearch} onFilter={handleFilter} />
+        <ProfileGrid profiles={filteredProfiles} />
+      </motion.div>
     </div>
   );
 }

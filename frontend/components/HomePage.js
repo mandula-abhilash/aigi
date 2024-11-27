@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import GiftSearchForm from "@/components/GiftSearchForm";
-import ProductGrid from "@/components/ProductGrid";
+import ProductGrid from "@/components/profiles/ProfileGrid";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { GiftIcon } from "lucide-react";
