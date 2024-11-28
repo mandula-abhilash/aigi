@@ -26,16 +26,29 @@ export function AuthProvider({ children }) {
   const checkAuth = async () => {
     try {
       const storedUser = localStorage.getItem("user");
-      if (storedUser) {
+      const accessToken = localStorage.getItem("accessToken");
+
+      if (storedUser && accessToken) {
         const userData = JSON.parse(storedUser);
         setUser(userData);
         await fetchTokens(userData);
+      } else {
+        clearAuthData();
       }
     } catch (error) {
       console.error("Auth check failed:", error);
+      clearAuthData();
     } finally {
       setLoading(false);
     }
+  };
+
+  const clearAuthData = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    setUser(null);
+    setTokens(0);
   };
 
   const fetchTokens = async (user) => {
@@ -50,26 +63,33 @@ export function AuthProvider({ children }) {
 
   const login = async (credentials) => {
     try {
-      const response = await loginApi(credentials);
-      const { user: userData, tokens: userTokens } = response.data;
+      const {
+        user: userData,
+        accessToken,
+        refreshToken,
+      } = await loginApi(credentials);
+
+      // Store tokens and user data
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("user", JSON.stringify(userData));
 
       setUser(userData);
-      setTokens(userTokens);
-      localStorage.setItem("user", JSON.stringify(userData));
+      await fetchTokens(userData);
 
       return { user: userData };
     } catch (error) {
+      clearAuthData();
       throw error;
     }
   };
 
   const logout = async () => {
     try {
-      localStorage.removeItem("user");
-      setUser(null);
-      setTokens(0);
+      clearAuthData();
     } catch (error) {
       console.error("Logout failed:", error);
+      clearAuthData();
     }
   };
 

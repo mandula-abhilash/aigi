@@ -30,12 +30,21 @@ export const register = async (userData) => {
 export const login = async (credentials) => {
   try {
     const response = await api.post("/api/auth/login", credentials);
-    return response.data;
+
+    if (response.data.status !== "success" || !response.data.data) {
+      throw new Error("Invalid response format");
+    }
+
+    return {
+      user: response.data.data.user,
+      accessToken: response.data.data.accessToken,
+      refreshToken: response.data.data.refreshToken,
+    };
   } catch (error) {
     if (error.response?.data?.error?.details) {
       throw new Error(error.response.data.error.details);
     }
-    throw new Error("Invalid email or password");
+    throw new Error(error.message || "Invalid email or password");
   }
 };
 
