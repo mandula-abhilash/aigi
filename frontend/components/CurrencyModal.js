@@ -59,7 +59,7 @@ export default function CurrencyModal({ isOpen, onClose }) {
                   {Object.entries(currencyMap).map(
                     ([country, { code, symbol, name }]) => (
                       <SelectItem
-                        key={code}
+                        key={code + country}
                         value={code}
                         className="relative flex cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none hover:bg-gray-100 dark:hover:bg-gray-700 data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
                       >

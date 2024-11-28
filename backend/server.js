@@ -59,7 +59,7 @@ const startServer = async () => {
     });
 
     const instanceId = parseInt(process.env.NODE_APP_INSTANCE || 0, 10);
-    const basePort = Number(process.env.PORT) || 6000;
+    const basePort = Number(process.env.PORT);
 
     const PORT = basePort + instanceId;
 
