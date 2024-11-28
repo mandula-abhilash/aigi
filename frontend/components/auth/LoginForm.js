@@ -1,26 +1,30 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/components/ui/use-toast';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Loader2 } from 'lucide-react';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
 
 const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 export default function LoginForm({ onSuccess }) {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const { toast } = useToast();
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     resolver: zodResolver(loginSchema),
   });
 
@@ -29,15 +33,15 @@ export default function LoginForm({ onSuccess }) {
       setLoading(true);
       await login(data);
       toast({
-        title: 'Success',
-        description: 'Logged in successfully!',
+        title: "Success",
+        description: "Logged in successfully!",
       });
       onSuccess?.();
     } catch (error) {
       toast({
-        title: 'Error',
-        description: error.message || 'Failed to login',
-        variant: 'destructive',
+        title: "Error",
+        description: error.message || "Failed to login",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -51,7 +55,7 @@ export default function LoginForm({ onSuccess }) {
         <Input
           id="email"
           type="email"
-          {...register('email')}
+          {...register("email")}
           placeholder="Enter your email"
         />
         {errors.email && (
@@ -64,7 +68,7 @@ export default function LoginForm({ onSuccess }) {
         <Input
           id="password"
           type="password"
-          {...register('password')}
+          {...register("password")}
           placeholder="Enter your password"
         />
         {errors.password && (
@@ -79,7 +83,7 @@ export default function LoginForm({ onSuccess }) {
             Logging in...
           </>
         ) : (
-          'Login'
+          "Login"
         )}
       </Button>
     </form>

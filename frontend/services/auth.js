@@ -21,6 +21,25 @@ export const register = async (userData) => {
 };
 
 /**
+ * Login user
+ * @param {Object} credentials - User login credentials
+ * @param {string} credentials.email - User's email address
+ * @param {string} credentials.password - User's password
+ * @returns {Promise<Object>} Login response with user data and tokens
+ */
+export const login = async (credentials) => {
+  try {
+    const response = await api.post("/api/auth/login", credentials);
+    return response.data;
+  } catch (error) {
+    if (error.response?.data?.error?.details) {
+      throw new Error(error.response.data.error.details);
+    }
+    throw new Error("Invalid email or password");
+  }
+};
+
+/**
  * Verify user's email
  * @param {string} token - Email verification token
  * @returns {Promise<Object>} Verification response

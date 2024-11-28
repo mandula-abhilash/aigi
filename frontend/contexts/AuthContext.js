@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from "react";
+import { login as loginApi } from "@/services/auth";
 
 const defaultContext = {
   user: null,
@@ -24,11 +25,14 @@ export function AuthProvider({ children }) {
 
   const checkAuth = async () => {
     try {
-      // Simulated auth check for demo
-      setUser(null);
-      setTokens(0);
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
+        setUser(userData);
+        await fetchTokens(userData);
+      }
     } catch (error) {
-      console.error('Auth check failed:', error);
+      console.error("Auth check failed:", error);
     } finally {
       setLoading(false);
     }
@@ -40,17 +44,20 @@ export function AuthProvider({ children }) {
       // Simulated token fetch for demo
       setTokens(100);
     } catch (error) {
-      console.error('Failed to fetch tokens:', error);
+      console.error("Failed to fetch tokens:", error);
     }
   };
 
   const login = async (credentials) => {
     try {
-      // Simulated login for demo
-      const mockUser = { id: 1, name: 'Demo User' };
-      setUser(mockUser);
-      fetchTokens(mockUser);
-      return { user: mockUser };
+      const response = await loginApi(credentials);
+      const { user: userData, tokens: userTokens } = response.data;
+
+      setUser(userData);
+      setTokens(userTokens);
+      localStorage.setItem("user", JSON.stringify(userData));
+
+      return { user: userData };
     } catch (error) {
       throw error;
     }
@@ -58,10 +65,11 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
+      localStorage.removeItem("user");
       setUser(null);
       setTokens(0);
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
     }
   };
 
@@ -80,7 +88,7 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }
