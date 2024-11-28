@@ -9,8 +9,6 @@ import { sesamConfig } from "./config/sesam.js";
 import geoRouter from "./routes/geo.routes.js";
 import suggestionsRoute from "./routes/suggestions.routes.js";
 
-const PORT = process.env.PORT || 6000;
-
 const startServer = async () => {
   const app = express();
 
@@ -60,8 +58,17 @@ const startServer = async () => {
       res.status(500).json({ error: "Internal server error" });
     });
 
+    const instanceId = parseInt(process.env.NODE_APP_INSTANCE || 0, 10);
+    const basePort = Number(process.env.PORT) || 6000;
+
+    const PORT = basePort + instanceId;
+
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(
+        `Server running in ${
+          process.env.NODE_ENV || "development"
+        } mode on port ${PORT}`
+      );
     });
   } catch (error) {
     console.error("Failed to initialize the application:", error.message);
