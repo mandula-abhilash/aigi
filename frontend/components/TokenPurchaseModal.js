@@ -1,38 +1,47 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
-import { Coins, Check, Gift, Star, Crown } from 'lucide-react';
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { Coins, Check, Gift, Star, Crown } from "lucide-react";
 
 const tokenPlans = [
   {
-    id: 'basic',
+    id: "basic",
     tokens: 10,
     price: 9.99,
     popular: false,
     icon: Gift,
-    color: 'from-emerald-500 to-teal-600',
-    features: ['Basic gift recommendations', '24/7 support']
+    color: "from-emerald-500 to-teal-600",
+    features: ["Basic gift recommendations", "24/7 support"],
   },
   {
-    id: 'pro',
+    id: "pro",
     tokens: 100,
     price: 49.99,
     popular: true,
     icon: Star,
-    color: 'from-violet-500 to-purple-600',
-    features: ['Advanced AI suggestions', 'Priority support', 'Save searches']
+    color: "from-violet-500 to-purple-600",
+    features: ["Advanced AI suggestions", "Priority support", "Save searches"],
   },
   {
-    id: 'enterprise',
+    id: "enterprise",
     tokens: 500,
     price: 199.99,
     popular: false,
     icon: Crown,
-    color: 'from-amber-500 to-orange-600',
-    features: ['Unlimited recommendations', 'Dedicated support', 'Custom categories']
+    color: "from-amber-500 to-orange-600",
+    features: [
+      "Unlimited recommendations",
+      "Dedicated support",
+      "Custom categories",
+    ],
   },
 ];
 
@@ -43,18 +52,18 @@ export default function TokenPurchaseModal({ isOpen, onClose }) {
   const handlePurchase = async (plan) => {
     try {
       setLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       toast({
-        title: 'Success',
+        title: "Success",
         description: `Successfully purchased ${plan.tokens} tokens!`,
       });
       onClose();
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to process purchase. Please try again.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to process purchase. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -72,7 +81,7 @@ export default function TokenPurchaseModal({ isOpen, onClose }) {
             Choose the perfect plan for your gifting needs
           </p>
         </DialogHeader>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
           {tokenPlans.map((plan) => {
             const PlanIcon = plan.icon;
@@ -80,7 +89,7 @@ export default function TokenPurchaseModal({ isOpen, onClose }) {
               <div
                 key={plan.id}
                 className={`relative rounded-2xl overflow-hidden transition-transform hover:scale-105 ${
-                  plan.popular ? 'ring-2 ring-violet-500 shadow-lg' : ''
+                  plan.popular ? "ring-2 ring-violet-500 shadow-lg" : ""
                 }`}
               >
                 {plan.popular && (
@@ -91,7 +100,9 @@ export default function TokenPurchaseModal({ isOpen, onClose }) {
                   </div>
                 )}
 
-                <div className={`bg-gradient-to-br ${plan.color} p-6 text-white h-full flex flex-col`}>
+                <div
+                  className={`bg-gradient-to-br ${plan.color} p-6 text-white h-full flex flex-col`}
+                >
                   <div className="text-center mb-6">
                     <div className="flex justify-center mb-4">
                       <PlanIcon className="w-12 h-12" />

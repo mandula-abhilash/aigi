@@ -7,7 +7,7 @@ import * as z from "zod";
 import { debounce } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Search, X, Loader2, DollarSign, Plus } from "lucide-react";
 import { getFieldSuggestions, getGiftSuggestions } from "@/services/api";

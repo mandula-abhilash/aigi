@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
-import { debounce } from '@/lib/utils';
-import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/components/ui/use-toast';
-import { Search } from 'lucide-react';
+import { useState, useCallback } from "react";
+import { debounce } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { Search } from "lucide-react";
 
 const SearchBar = ({ onSearch }) => {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const { user } = useAuth();
   const { toast } = useToast();
@@ -22,17 +22,17 @@ const SearchBar = ({ onSearch }) => {
       try {
         // Simulated API call for demo
         const mockSuggestions = [
-          'Gift for new mom',
-          'Birthday gift for dad',
-          'Anniversary present',
-          'Graduation gift'
+          "Gift for new mom",
+          "Birthday gift for dad",
+          "Anniversary present",
+          "Graduation gift",
         ];
         setSuggestions(mockSuggestions);
       } catch (error) {
         toast({
-          title: 'Error',
+          title: "Error",
           description: error.message,
-          variant: 'destructive',
+          variant: "destructive",
         });
       }
     }, 300),

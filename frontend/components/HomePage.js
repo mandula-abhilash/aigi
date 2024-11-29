@@ -4,7 +4,7 @@ import { useState } from "react";
 import GiftSearchForm from "@/components/GiftSearchForm";
 import ProductGrid from "@/components/profiles/ProfileGrid";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { GiftIcon } from "lucide-react";
 
 export default function HomePage() {

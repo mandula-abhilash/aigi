@@ -31,7 +31,12 @@ export const login = async (credentials) => {
   try {
     const response = await api.post("/api/auth/login", credentials);
 
-    if (response.data.status !== "success" || !response.data.data) {
+    // Check if the response indicates an error
+    if (response.data.status === "error") {
+      throw new Error(response.data.error.details || "Login failed");
+    }
+
+    if (!response.data.data) {
       throw new Error("Invalid response format");
     }
 

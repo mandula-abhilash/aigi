@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
-import { Trash2, ExternalLink, Loader2 } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { Trash2, ExternalLink, Loader2 } from "lucide-react";
 
 export default function SavedProducts() {
   const [products, setProducts] = useState([]);
@@ -19,12 +19,13 @@ export default function SavedProducts() {
   const fetchSavedProducts = async () => {
     try {
       setLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setProducts([
         {
           id: 1,
           title: "Premium Maternity Pillow",
-          image: "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=500&h=500&fit=crop",
+          image:
+            "https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=500&h=500&fit=crop",
           price: "$49.99",
           link: "#",
           savedAt: new Date().toISOString(),
@@ -32,9 +33,9 @@ export default function SavedProducts() {
       ]);
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to fetch saved products',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to fetch saved products",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -43,17 +44,17 @@ export default function SavedProducts() {
 
   const handleRemove = async (productId) => {
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setProducts(products.filter(p => p.id !== productId));
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setProducts(products.filter((p) => p.id !== productId));
       toast({
-        title: 'Success',
-        description: 'Product removed from saved items',
+        title: "Success",
+        description: "Product removed from saved items",
       });
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to remove product',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to remove product",
+        variant: "destructive",
       });
     }
   };
@@ -93,7 +94,9 @@ export default function SavedProducts() {
               <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 {product.title}
               </h3>
-              <p className="text-primary font-medium text-lg mb-4">{product.price}</p>
+              <p className="text-primary font-medium text-lg mb-4">
+                {product.price}
+              </p>
               <div className="flex items-center justify-between">
                 <Button
                   variant="outline"

@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
-import { Trash2, Search, Loader2 } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
+import { Trash2, Search, Loader2 } from "lucide-react";
 
 export default function SavedSearches() {
   const [searches, setSearches] = useState([]);
@@ -20,7 +20,7 @@ export default function SavedSearches() {
     try {
       setLoading(true);
       // Simulated API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setSearches([
         {
           id: 1,
@@ -31,9 +31,9 @@ export default function SavedSearches() {
       ]);
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to fetch saved searches',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to fetch saved searches",
+        variant: "destructive",
       });
     } finally {
       setLoading(false);
@@ -43,17 +43,17 @@ export default function SavedSearches() {
   const handleRemove = async (searchId) => {
     try {
       // Simulated API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setSearches(searches.filter(s => s.id !== searchId));
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setSearches(searches.filter((s) => s.id !== searchId));
       toast({
-        title: 'Success',
-        description: 'Search removed from saved items',
+        title: "Success",
+        description: "Search removed from saved items",
       });
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to remove search',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to remove search",
+        variant: "destructive",
       });
     }
   };
