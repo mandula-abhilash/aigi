@@ -8,6 +8,7 @@ import { sesamConfig } from "./config/sesam.js";
 
 import geoRouter from "./routes/geo.routes.js";
 import suggestionsRoute from "./routes/suggestions.routes.js";
+import createSuggestionsRouter from "./routes/suggestions.routes.js";
 
 const startServer = async () => {
   const app = express();
@@ -35,7 +36,7 @@ const startServer = async () => {
     app.use("/api/geo", geoRouter);
 
     // Mount the suggestions route
-    app.use("/api/suggestions", suggestionsRoute);
+    app.use("/api/suggestions", createSuggestionsRouter(middleware));
 
     // Example of a protected route
     app.get("/api/protected", middleware.protect, (req, res) => {

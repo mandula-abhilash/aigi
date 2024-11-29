@@ -4,20 +4,31 @@ import {
   giftSuggestions,
 } from "../controllers/suggestions.controller.js";
 
-const router = express.Router();
-
 /**
- * Route for field suggestions (Next Input Predictions).
- * @method POST
- * @route /api/suggestions/fields
+ * Function to create the suggestions router with middleware.
+ * @param {Object} middleware - Middleware object from visdak-sesam.
+ * @returns {Router} - Configured suggestions router.
  */
-router.post("/fields", fieldSuggestions);
+const createSuggestionsRouter = (middleware) => {
+  const router = express.Router();
 
-/**
- * Route for gift suggestions based on user input.
- * @method POST
- * @route /api/suggestions/gifts
- */
-router.post("/gifts", giftSuggestions);
+  /**
+   * Route for field suggestions (Next Input Predictions).
+   * Protected route.
+   * @method POST
+   * @route /api/suggestions/fields
+   */
+  router.post("/fields", middleware.protect, fieldSuggestions);
 
-export default router;
+  /**
+   * Route for gift suggestions based on user input.
+   * Protected route.
+   * @method POST
+   * @route /api/suggestions/gifts
+   */
+  router.post("/gifts", middleware.protect, giftSuggestions);
+
+  return router;
+};
+
+export default createSuggestionsRouter;

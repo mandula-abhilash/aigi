@@ -35,6 +35,7 @@ export default function LoginForm({ onSuccess }) {
       toast({
         title: "Success",
         description: "Logged in successfully!",
+        duration: 3000,
       });
       onSuccess?.();
     } catch (error) {
@@ -42,6 +43,7 @@ export default function LoginForm({ onSuccess }) {
         title: "Error",
         description: error.message || "Failed to login",
         variant: "destructive",
+        duration: 3000,
       });
     } finally {
       setLoading(false);
