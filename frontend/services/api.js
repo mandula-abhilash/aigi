@@ -1,19 +1,25 @@
-import { createAxiosInstance } from "visdak-aim";
+import { createAxiosInstance, tokenManager } from "visdak-aim";
 
+// Centralized API endpoints
+const ENDPOINTS = {
+  FIELD_SUGGESTIONS: "/api/suggestions/fields",
+  GIFT_SUGGESTIONS: "/api/suggestions/gifts",
+  GEO_IP: "/api/geo/ip",
+  GEO_LOCATION: "/api/geo/location",
+};
+
+// Axios instance with configuration
 const api = createAxiosInstance({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000",
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   timeout: 10000,
   retryCount: 3,
   retryDelay: 1000,
   onUnauthorized: () => {
-    // Clear auth data and redirect to login
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    tokenManager.removeToken();
     localStorage.removeItem("user");
     window.location.href = "/";
   },
   onForbidden: () => {
-    // Handle forbidden access
     console.error("Access forbidden");
   },
   onRetry: (retryCount) => {
@@ -24,10 +30,11 @@ const api = createAxiosInstance({
   },
 });
 
+// Wrapper for getting field suggestions
 export const getFieldSuggestions = async (field, context = {}) => {
   try {
     const normalizedField = field === "interest" ? "interest" : field;
-    const response = await api.post("/api/suggestions/fields", {
+    const response = await api.post(ENDPOINTS.FIELD_SUGGESTIONS, {
       field: normalizedField,
       context,
     });
@@ -38,14 +45,27 @@ export const getFieldSuggestions = async (field, context = {}) => {
 
     return suggestions.filter(Boolean);
   } catch (error) {
-    console.error("Error fetching field suggestions:", error);
+    if (error.response) {
+      console.error(
+        "Error fetching field suggestions (API):",
+        error.response.data
+      );
+    } else if (error.request) {
+      console.error(
+        "Error fetching field suggestions (Network):",
+        error.message
+      );
+    } else {
+      console.error("Error fetching field suggestions (Other):", error.message);
+    }
     return [];
   }
 };
 
+// Wrapper for getting gift suggestions
 export const getGiftSuggestions = async (formData) => {
   try {
-    const response = await api.post("/api/suggestions/gifts", {
+    const response = await api.post(ENDPOINTS.GIFT_SUGGESTIONS, {
       recipient: formData.recipient,
       occasion: formData.occasion,
       interests: formData.interests,
@@ -53,19 +73,61 @@ export const getGiftSuggestions = async (formData) => {
     });
     return response.data || [];
   } catch (error) {
-    console.error("Error fetching gift suggestions:", error);
+    if (error.response) {
+      console.error(
+        "Error fetching gift suggestions (API):",
+        error.response.data
+      );
+    } else if (error.request) {
+      console.error(
+        "Error fetching gift suggestions (Network):",
+        error.message
+      );
+    } else {
+      console.error("Error fetching gift suggestions (Other):", error.message);
+    }
     throw new Error("Failed to fetch gift suggestions");
   }
 };
 
+// Wrapper for getting the user's IP address
 export const getIpAddress = async () => {
-  const response = await api.get("/api/geo/ip");
-  return response.data;
+  try {
+    const response = await api.get(ENDPOINTS.GEO_IP);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      console.error("Error fetching IP address (API):", error.response.data);
+    } else if (error.request) {
+      console.error("Error fetching IP address (Network):", error.message);
+    } else {
+      console.error("Error fetching IP address (Other):", error.message);
+    }
+    throw new Error("Failed to fetch IP address");
+  }
 };
 
+// Wrapper for getting location details
 export const getLocationDetails = async () => {
-  const response = await api.get("/api/geo/location");
-  return response.data;
+  try {
+    const response = await api.get(ENDPOINTS.GEO_LOCATION);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      console.error(
+        "Error fetching location details (API):",
+        error.response.data
+      );
+    } else if (error.request) {
+      console.error(
+        "Error fetching location details (Network):",
+        error.message
+      );
+    } else {
+      console.error("Error fetching location details (Other):", error.message);
+    }
+    throw new Error("Failed to fetch location details");
+  }
 };
 
 export default api;
