@@ -1,10 +1,12 @@
-import express from "express";
 import cors from "cors";
+import express from "express";
 import helmet from "helmet";
-import compression from "compression";
 import morgan from "morgan";
-import { createAuthModule } from "visdak-sesam";
+import compression from "compression";
+import cookieParser from "cookie-parser";
+
 import { sesamConfig } from "./config/sesam.js";
+import { createAuthModule } from "visdak-sesam";
 
 import geoRouter from "./routes/geo.routes.js";
 import createSuggestionsRouter from "./routes/suggestions.routes.js";
@@ -13,7 +15,8 @@ const startServer = async () => {
   const app = express();
 
   // Middleware
-  app.use(cors());
+  app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+  app.use(cookieParser());
   app.use(helmet()); // Security headers
   app.use(compression()); // GZIP compression
   app.use(express.json());
