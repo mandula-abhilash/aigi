@@ -10,6 +10,7 @@ import { createAuthModule } from "visdak-sesam";
 
 import geoRouter from "./routes/geo.routes.js";
 import createSuggestionsRouter from "./routes/suggestions.routes.js";
+import createGiftProfilesRouter from "./routes/giftProfiles.routes.js";
 
 const startServer = async () => {
   const app = express();
@@ -39,6 +40,9 @@ const startServer = async () => {
 
     // Mount the suggestions route
     app.use("/api/suggestions", createSuggestionsRouter(middleware));
+
+    // Mount the gift profiles route
+    app.use("/api/gift-profiles", createGiftProfilesRouter(middleware));
 
     // Example of a protected route
     app.get("/api/protected", middleware.protect, (req, res) => {
