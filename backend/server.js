@@ -7,7 +7,6 @@ import { createAuthModule } from "visdak-sesam";
 import { sesamConfig } from "./config/sesam.js";
 
 import geoRouter from "./routes/geo.routes.js";
-import suggestionsRoute from "./routes/suggestions.routes.js";
 import createSuggestionsRouter from "./routes/suggestions.routes.js";
 
 const startServer = async () => {
