@@ -29,20 +29,21 @@ export function CurrencyProvider({ children }) {
   const [isInitialized, setIsInitialized] = useState(false);
   const [userIp, setUserIp] = useState("");
 
-  const updateCurrencyState = (countryCode) => {
+  const updateCurrencyState = (countryCode, ip) => {
     const marketplaceData = getMarketplaceData(countryCode);
     const currencyData = getCurrencyData(countryCode);
 
     setCurrency(currencyData.code);
     setCurrencySymbol(currencyData.symbol);
     setMarketplace(marketplaceData.marketplace);
+    setUserIp(ip);
 
     const data = {
       countryCode,
       marketplace: marketplaceData.marketplace,
       currencyCode: currencyData.code,
       currencySymbol: currencyData.symbol,
-      userIp,
+      userIp: ip,
     };
 
     storeMarketplaceData(data);
@@ -50,37 +51,24 @@ export function CurrencyProvider({ children }) {
 
   const detectUserLocation = async () => {
     try {
-      // Get IP address
-      const ipData = await getIpAddress();
-      setUserIp(ipData.ip);
-
-      // Get location details
-      const locationData = await getLocationDetails();
-      const countryCode = locationData.country;
-
-      // Get stored data
       const storedData = getStoredMarketplaceData();
+      const ipData = await getIpAddress();
+      const currentIp = ipData.ip;
 
-      if (storedData) {
-        // If stored data exists but country changed, update everything
-        if (storedData.countryCode !== countryCode) {
-          updateCurrencyState(countryCode);
-          setShowCurrencyModal(true);
-        } else {
-          // Use stored data
-          setCurrency(storedData.currencyCode);
-          setCurrencySymbol(storedData.currencySymbol);
-          setMarketplace(storedData.marketplace);
-        }
-      } else {
-        // No stored data, set defaults based on detected country
-        updateCurrencyState(countryCode);
+      if (!storedData || storedData.userIp !== currentIp) {
+        const locationData = await getLocationDetails();
+        const countryCode = locationData.country;
+        updateCurrencyState(countryCode, currentIp);
         setShowCurrencyModal(true);
+      } else {
+        setCurrency(storedData.currencyCode);
+        setCurrencySymbol(storedData.currencySymbol);
+        setMarketplace(storedData.marketplace);
+        setUserIp(storedData.userIp);
       }
     } catch (error) {
       console.error("Failed to detect location:", error);
-      // Fallback to US
-      updateCurrencyState("US");
+      updateCurrencyState("US", "");
       setShowCurrencyModal(true);
     } finally {
       setIsInitialized(true);
@@ -98,7 +86,7 @@ export function CurrencyProvider({ children }) {
         (key) => getCurrencyData(key).code === currencyCode
       );
       if (countryCode) {
-        updateCurrencyState(countryCode);
+        updateCurrencyState(countryCode, userIp);
       }
     },
     showCurrencyModal,

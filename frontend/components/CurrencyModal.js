@@ -20,7 +20,8 @@ import { Check } from "lucide-react";
 import { currencyMap } from "@/lib/marketplace";
 
 export default function CurrencyModal({ isOpen, onClose }) {
-  const { currency, setCurrency, currencySymbol, marketplace } = useCurrency();
+  const { currency, setCurrency, currencySymbol, marketplace, userIp } =
+    useCurrency();
   const [selectedCurrency, setSelectedCurrency] = useState(currency);
 
   const handleSave = () => {
