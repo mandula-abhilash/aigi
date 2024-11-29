@@ -1,16 +1,18 @@
-import { GiftProfileModel } from "../models/giftProfile.model";
+import { GiftProfileModel } from "../models/giftProfile.model.js";
 
 /**
  * Create a new gift profile
  */
 export const createGiftProfile = async (req, res) => {
   try {
-    const { title, description, image, interests, products } = req.body;
+    const { title, description, image, imageCredit, interests, products } =
+      req.body;
 
     const giftProfile = new GiftProfileModel({
       title,
       description,
       image,
+      imageCredit,
       interests,
       products,
     });
@@ -63,11 +65,12 @@ export const getGiftProfileById = async (req, res) => {
 export const updateGiftProfile = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, image, interests, products } = req.body;
+    const { title, description, image, imageCredit, interests, products } =
+      req.body;
 
     const giftProfile = await GiftProfileModel.findByIdAndUpdate(
       id,
-      { title, description, image, interests, products },
+      { title, description, image, imageCredit, interests, products },
       { new: true }
     );
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ExternalLink, Gift } from "lucide-react";
+import { ExternalLink, Gift, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -44,6 +44,11 @@ export default function ProfilePageClient({ profile }) {
               alt={profile.title}
               className="w-full h-full object-cover"
             />
+            {profile.imageCredit && (
+              <div className="absolute bottom-0 right-0 p-2 text-sm text-white/70 bg-black/30">
+                {profile.imageCredit}
+              </div>
+            )}
           </div>
 
           {/* Interests Section */}
@@ -73,6 +78,18 @@ export default function ProfilePageClient({ profile }) {
                       <CardTitle>{product.title}</CardTitle>
                     </div>
                     <CardDescription>{product.description}</CardDescription>
+                    {product.keywords && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {product.keywords.map((keyword, i) => (
+                          <span
+                            key={i}
+                            className="px-2 py-0.5 text-xs bg-secondary rounded-full"
+                          >
+                            {keyword}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </CardHeader>
                   <CardContent>
                     <div className="flex justify-end">

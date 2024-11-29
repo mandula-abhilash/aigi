@@ -153,11 +153,13 @@ export const giftSuggestions = async (req, res) => {
         .json({ error: "At least recipient or occasion must be provided." });
     }
 
+    // "You are an AI that provides structured gift suggestions for users based on recipient details, occasion, interests, and budget. Your responses must strictly adhere to the provided JSON schema.",
+
     const messages = [
       {
         role: "system",
         content:
-          "You are an AI that provides structured gift suggestions for users based on recipient details, occasion, interests, and budget. Your responses must strictly adhere to the provided JSON schema.",
+          "You are an AI that provides structured gift suggestions for users based on recipient details, occasion, interests. Your responses must strictly adhere to the provided JSON schema.",
       },
       {
         role: "user",
@@ -174,11 +176,14 @@ export const giftSuggestions = async (req, res) => {
               ? `- Interests: ${interests.join(", ")}`
               : "- Interests: Not specified"
           }
-          ${budget ? `- Budget: ${budget}` : "- Budget: Not specified"}
           Provide 5 personalized gift suggestions adhering to the specified JSON schema.
         `,
       },
     ];
+
+    // ${budget ? `- Budget: ${budget}` : "- Budget: Not specified"}
+    // Provide 5 personalized gift suggestions adhering to the specified JSON schema.
+    console.log(messages);
 
     const response = await openai.chat.completions.create({
       model: process.env.OPEN_AI_MODEL,

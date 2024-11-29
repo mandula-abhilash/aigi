@@ -229,12 +229,12 @@ export default function GiftSearchForm() {
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="maxBudget" className="text-sm font-medium">
+            {/* <label htmlFor="maxBudget" className="text-sm font-medium">
               Maximum Budget ({currencySymbol})
-            </label>
+            </label> */}
             <div className="relative">
               {/* <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" /> */}
-              <Input
+              {/* <Input
                 id="maxBudget"
                 type="number"
                 min="1"
@@ -246,7 +246,7 @@ export default function GiftSearchForm() {
                 <p className="mt-1 text-sm text-red-500">
                   {errors.maxBudget.message}
                 </p>
-              )}
+              )} */}
             </div>
           </div>
         </div>

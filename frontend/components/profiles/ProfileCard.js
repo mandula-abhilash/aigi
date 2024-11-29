@@ -21,6 +21,11 @@ export default function ProfileCard({ profile }) {
           alt={profile.title}
           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
         />
+        {profile.imageCredit && (
+          <div className="absolute bottom-0 right-0 z-20 p-1 text-xs text-white/70 bg-black/30">
+            {profile.imageCredit}
+          </div>
+        )}
         <div className="absolute bottom-4 left-4 right-4 z-20">
           <h3 className="text-lg font-semibold text-white line-clamp-2">
             {profile.title}

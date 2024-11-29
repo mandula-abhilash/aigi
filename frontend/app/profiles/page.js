@@ -6,6 +6,7 @@ import ProfileGrid from "@/components/profiles/ProfileGrid";
 import SearchFilters from "@/components/profiles/SearchFilters";
 import AddGiftProfileButton from "@/components/profiles/AddGiftProfileButton";
 import { motion } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ProfilesPage() {
   const [profiles, setProfiles] = useState([]);
@@ -13,6 +14,7 @@ export default function ProfilesPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("");
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchProfiles();
@@ -29,7 +31,11 @@ export default function ProfilesPage() {
       setProfiles(data);
       setFilteredProfiles(data);
     } catch (error) {
-      console.error("Failed to fetch profiles:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to fetch profiles",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -98,7 +104,7 @@ export default function ProfilesPage() {
 
         <div className="flex justify-between items-center mb-8">
           <SearchFilters onSearch={handleSearch} onFilter={handleFilter} />
-          <AddGiftProfileButton />
+          <AddGiftProfileButton onProfileAdded={fetchProfiles} />
         </div>
 
         <ProfileGrid profiles={filteredProfiles} />

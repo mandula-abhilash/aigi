@@ -2,60 +2,60 @@ import api from "./api";
 
 export async function getGiftProfiles() {
   try {
-    // For development, return mock data until the API is ready
-    return [
-      {
-        id: 1,
-        title: "Birthday Gifts for Tech Enthusiasts",
-        description: "Perfect gifts for the tech-savvy person in your life",
-        image:
-          "https://images.unsplash.com/photo-1550009158-9ebf69173e03?w=500&h=350&fit=crop",
-        interests: ["Technology", "Gadgets", "Innovation"],
-        views: 1200,
-        createdAt: "2024-02-01",
-      },
-      {
-        id: 2,
-        title: "Eco-Friendly Gift Ideas",
-        description: "Sustainable and environmentally conscious gift options",
-        image:
-          "https://images.unsplash.com/photo-1610555356070-d0efb6505f81?w=500&h=350&fit=crop",
-        interests: ["Sustainability", "Eco-Friendly", "Green Living"],
-        views: 980,
-        createdAt: "2024-02-05",
-      },
-      {
-        id: 3,
-        title: "Gifts for Coffee Lovers",
-        description: "Delightful presents for coffee enthusiasts",
-        image:
-          "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=500&h=350&fit=crop",
-        interests: ["Coffee", "Beverages", "Gourmet"],
-        views: 850,
-        createdAt: "2024-02-10",
-      },
-    ];
-
-    // When API is ready, uncomment this:
-    // const response = await api.get('/api/profiles');
-    // return response.data;
+    const response = await api.get("/api/gift-profiles");
+    return response.data;
   } catch (error) {
     console.error("Error fetching gift profiles:", error);
-    return [];
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch gift profiles"
+    );
+  }
+}
+
+export async function getGiftProfileById(id) {
+  try {
+    const response = await api.get(`/api/gift-profiles/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching gift profile:", error);
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch gift profile"
+    );
   }
 }
 
 export async function createGiftProfile(profileData) {
   try {
-    // For development, just log the data
-    console.log("Creating gift profile:", profileData);
-    return { success: true };
-
-    // When API is ready:
-    // const response = await api.post('/api/profiles', profileData);
-    // return response.data;
+    const response = await api.post("/api/gift-profiles", profileData);
+    return response.data;
   } catch (error) {
     console.error("Error creating gift profile:", error);
-    throw new Error("Failed to create gift profile");
+    throw new Error(
+      error.response?.data?.message || "Failed to create gift profile"
+    );
+  }
+}
+
+export async function updateGiftProfile(id, profileData) {
+  try {
+    const response = await api.put(`/api/gift-profiles/${id}`, profileData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating gift profile:", error);
+    throw new Error(
+      error.response?.data?.message || "Failed to update gift profile"
+    );
+  }
+}
+
+export async function deleteGiftProfile(id) {
+  try {
+    const response = await api.delete(`/api/gift-profiles/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting gift profile:", error);
+    throw new Error(
+      error.response?.data?.message || "Failed to delete gift profile"
+    );
   }
 }

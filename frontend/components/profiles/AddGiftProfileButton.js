@@ -4,9 +4,14 @@ import { Plus } from "lucide-react";
 import AddGiftProfileDialog from "./AddGiftProfileDialog";
 import { useAuth } from "@/contexts/AuthContext";
 
-export default function AddGiftProfileButton() {
+export default function AddGiftProfileButton({ onProfileAdded }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { user } = useAuth();
+
+  const handleProfileAdded = () => {
+    setIsDialogOpen(false);
+    onProfileAdded?.();
+  };
 
   if (!user?.role === "admin") return null;
 
@@ -23,6 +28,7 @@ export default function AddGiftProfileButton() {
       <AddGiftProfileDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
+        onSuccess={handleProfileAdded}
       />
     </>
   );

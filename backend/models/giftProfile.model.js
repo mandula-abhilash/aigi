@@ -30,6 +30,14 @@ const productSchema = new Schema(
       minlength: [10, "Description must be at least 10 characters long"],
       trim: true,
     },
+    keywords: {
+      type: [String],
+      required: [true, "At least one keyword is required"],
+      validate: {
+        validator: (v) => Array.isArray(v) && v.length > 0,
+        message: "At least one keyword is required",
+      },
+    },
   },
   { _id: false } // Sub-document schema, no separate _id
 );
@@ -65,6 +73,11 @@ const giftProfileSchema = new Schema(
         },
         message: "Please provide a valid URL for the image",
       },
+    },
+    imageCredit: {
+      type: String,
+      required: [true, "Image credit is required"],
+      trim: true,
     },
     interests: {
       type: [String],
