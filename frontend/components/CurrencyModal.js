@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,7 +18,12 @@ import {
 } from "@/components/ui/select";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Check } from "lucide-react";
-import { currencyMap } from "@/lib/marketplace";
+import {
+  currencyMap,
+  getMarketplaceData,
+  getCurrencyData,
+  storeMarketplaceData,
+} from "@/lib/marketplace";
 
 export default function CurrencyModal({ isOpen, onClose }) {
   const { currency, setCurrency, currencySymbol, marketplace, userIp } =
@@ -25,7 +31,25 @@ export default function CurrencyModal({ isOpen, onClose }) {
   const [selectedCurrency, setSelectedCurrency] = useState(currency);
 
   const handleSave = () => {
-    setCurrency(selectedCurrency);
+    setCurrency(selectedCurrency); // Updates the state and calls the context function
+    const countryCode = Object.keys(currencyMap).find(
+      (key) => currencyMap[key].code === selectedCurrency
+    );
+
+    if (countryCode) {
+      const marketplaceData = getMarketplaceData(countryCode);
+      const currencyData = getCurrencyData(countryCode);
+      const data = {
+        countryCode,
+        marketplace: marketplaceData.marketplace,
+        currencyCode: currencyData.code,
+        currencySymbol: currencyData.symbol,
+        userIp,
+      };
+
+      storeMarketplaceData(data);
+    }
+
     onClose();
   };
 
@@ -36,6 +60,10 @@ export default function CurrencyModal({ isOpen, onClose }) {
           <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
             Confirm Your Location Settings
           </DialogTitle>
+          <DialogDescription className="text-sm text-gray-600 dark:text-gray-400">
+            Please select your currency preference. This will be used to display
+            prices across the platform.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="py-4 space-y-4">

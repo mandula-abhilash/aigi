@@ -53,32 +53,32 @@ export default function Header() {
 
           <nav className="hidden md:flex items-center space-x-4">
             <Button
-              variant="ghost"
+              variant="outline"
               onClick={() => setIsCurrencyModalOpen(true)}
               className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
             >
-              <span>{currencySymbol}</span>
+              <span className="text-amber-500">{currencySymbol}</span>
               <span>{currency}</span>
             </Button>
 
             {user ? (
               <>
-                <Link href="/saved">
-                  <Button variant="ghost" className="flex items-center">
-                    <BookmarkIcon className="w-4 h-4 mr-2" />
-                    Saved Items
-                  </Button>
-                </Link>
                 <Button
                   variant="outline"
                   onClick={() => setIsTokenModalOpen(true)}
                   className="flex items-center space-x-2"
                 >
-                  <Coins className="w-4 h-4" />
+                  <Coins className="w-4 h-4 text-blue-500" />
                   <span>{tokens} Tokens</span>
                 </Button>
-                <Button variant="ghost" onClick={logout}>
-                  <LogOut className="w-4 h-4 mr-2" />
+                <Link href="/saved">
+                  <Button variant="outline" className="flex items-center">
+                    <BookmarkIcon className="w-4 h-4 mr-2 text-green-500" />
+                    Saved Items
+                  </Button>
+                </Link>
+                <Button variant="outline" onClick={logout}>
+                  <LogOut className="w-4 h-4 mr-2 text-red-500" />
                   Sign Out
                 </Button>
               </>

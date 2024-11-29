@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { getIpAddress, getLocationDetails } from "@/services/api";
 import {
+  currencyMap,
   getMarketplaceData,
   getCurrencyData,
   getStoredMarketplaceData,
@@ -82,13 +83,30 @@ export function CurrencyProvider({ children }) {
   const value = {
     currency,
     setCurrency: (currencyCode) => {
-      const countryCode = Object.keys(getCurrencyData()).find(
-        (key) => getCurrencyData(key).code === currencyCode
+      const countryCode = Object.keys(currencyMap).find(
+        (key) => currencyMap[key].code === currencyCode
       );
+
       if (countryCode) {
-        updateCurrencyState(countryCode, userIp);
+        const marketplaceData = getMarketplaceData(countryCode);
+        const currencyData = getCurrencyData(countryCode);
+
+        setCurrency(currencyData.code);
+        setCurrencySymbol(currencyData.symbol);
+        setMarketplace(marketplaceData.marketplace);
+
+        const data = {
+          countryCode,
+          marketplace: marketplaceData.marketplace,
+          currencyCode: currencyData.code,
+          currencySymbol: currencyData.symbol,
+          userIp,
+        };
+
+        storeMarketplaceData(data);
       }
     },
+
     showCurrencyModal,
     setShowCurrencyModal,
     currencySymbol,
