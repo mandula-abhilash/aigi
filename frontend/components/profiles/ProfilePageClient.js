@@ -65,28 +65,27 @@ export default function ProfilePageClient({ profile }) {
           <div className="space-y-4">
             <h2 className="text-2xl font-semibold">Suggested Gifts</h2>
             <div className="grid gap-4">
-              {[1, 2, 3].map((_, index) => (
+              {profile.products.map((product, index) => (
                 <Card key={index}>
                   <CardHeader>
                     <div className="flex items-center gap-2">
                       <Gift className="h-5 w-5 text-primary" />
-                      <CardTitle>Gift Suggestion {index + 1}</CardTitle>
+                      <CardTitle>{product.title}</CardTitle>
                     </div>
-                    <CardDescription>
-                      Perfect for{" "}
-                      {profile.interests[index % profile.interests.length]}{" "}
-                      enthusiasts
-                    </CardDescription>
+                    <CardDescription>{product.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg font-medium text-primary">
-                        $49.99
-                      </span>
-                      <Button variant="outline" size="sm" className="gap-2">
-                        <ExternalLink className="h-4 w-4" />
-                        View on Amazon
-                      </Button>
+                    <div className="flex justify-end">
+                      <a
+                        href={product.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <ExternalLink className="h-4 w-4" />
+                          View on Amazon
+                        </Button>
+                      </a>
                     </div>
                   </CardContent>
                 </Card>

@@ -44,3 +44,18 @@ export async function getGiftProfiles() {
     return [];
   }
 }
+
+export async function createGiftProfile(profileData) {
+  try {
+    // For development, just log the data
+    console.log("Creating gift profile:", profileData);
+    return { success: true };
+
+    // When API is ready:
+    // const response = await api.post('/api/profiles', profileData);
+    // return response.data;
+  } catch (error) {
+    console.error("Error creating gift profile:", error);
+    throw new Error("Failed to create gift profile");
+  }
+}

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { getGiftProfiles } from "@/services/profiles";
 import ProfileGrid from "@/components/profiles/ProfileGrid";
 import SearchFilters from "@/components/profiles/SearchFilters";
+import AddGiftProfileButton from "@/components/profiles/AddGiftProfileButton";
 import { motion } from "framer-motion";
 
 export default function ProfilesPage() {
@@ -95,7 +96,11 @@ export default function ProfilesPage() {
           </p>
         </div>
 
-        <SearchFilters onSearch={handleSearch} onFilter={handleFilter} />
+        <div className="flex justify-between items-center mb-8">
+          <SearchFilters onSearch={handleSearch} onFilter={handleFilter} />
+          <AddGiftProfileButton />
+        </div>
+
         <ProfileGrid profiles={filteredProfiles} />
       </motion.div>
     </div>
