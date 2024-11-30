@@ -25,7 +25,7 @@ export const register = async (userData) => {
  * @param {Object} credentials - User login credentials
  * @param {string} credentials.email - User's email address
  * @param {string} credentials.password - User's password
- * @returns {Promise<Object>} Login response with user data and tokens
+ * @returns {Promise<Object>} Login response with user data
  */
 export const login = async (credentials) => {
   try {
@@ -42,14 +42,28 @@ export const login = async (credentials) => {
 
     return {
       user: response.data.data.user,
-      accessToken: response.data.data.accessToken,
-      refreshToken: response.data.data.refreshToken,
     };
   } catch (error) {
     if (error.response?.data?.error?.details) {
       throw new Error(error.response.data.error.details);
     }
     throw new Error(error.message || "Invalid email or password");
+  }
+};
+
+/**
+ * Logout user
+ * @returns {Promise<Object>} Logout response
+ */
+export const logout = async () => {
+  try {
+    const response = await api.post("/api/auth/logout");
+    return response.data;
+  } catch (error) {
+    if (error.response?.data?.error?.details) {
+      throw new Error(error.response.data.error.details);
+    }
+    throw new Error("Logout failed. Please try again.");
   }
 };
 
@@ -64,5 +78,18 @@ export const verifyEmail = async (token) => {
     return response.data;
   } catch (error) {
     throw new Error("Email verification failed. Please try again.");
+  }
+};
+
+/**
+ * Check user session
+ * @returns {Promise<Object>} Session data with user info
+ */
+export const checkSession = async () => {
+  try {
+    const response = await api.get("/api/auth/session");
+    return response.data;
+  } catch (error) {
+    throw new Error("Session check failed. Please log in again.");
   }
 };

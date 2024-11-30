@@ -1,7 +1,11 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import { login as loginApi } from "@/services/auth";
+import {
+  login as loginApi,
+  checkSession,
+  logout as logoutApi,
+} from "@/services/auth";
 
 const defaultContext = {
   user: null,
@@ -20,33 +24,39 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
+    const checkAuth = async () => {
+      try {
+        const response = await checkSession();
+        const user = response?.data?.user;
+        if (isMounted && user) {
+          setUser(user);
+          await fetchTokens(user);
+        } else {
+          if (isMounted) {
+            clearAuthData();
+          }
+        }
+      } catch (error) {
+        if (isMounted) {
+          clearAuthData();
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
     checkAuth();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const checkAuth = async () => {
-    try {
-      const storedUser = localStorage.getItem("user");
-      const accessToken = localStorage.getItem("accessToken");
-
-      if (storedUser && accessToken) {
-        const userData = JSON.parse(storedUser);
-        setUser(userData);
-        await fetchTokens(userData);
-      } else {
-        clearAuthData();
-      }
-    } catch (error) {
-      console.error("Auth check failed:", error);
-      clearAuthData();
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const clearAuthData = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
     setUser(null);
     setTokens(0);
   };
@@ -54,7 +64,6 @@ export function AuthProvider({ children }) {
   const fetchTokens = async (user) => {
     if (!user) return;
     try {
-      // Simulated token fetch for demo
       setTokens(100);
     } catch (error) {
       console.error("Failed to fetch tokens:", error);
@@ -63,21 +72,14 @@ export function AuthProvider({ children }) {
 
   const login = async (credentials) => {
     try {
-      const {
-        user: userData,
-        accessToken,
-        refreshToken,
-      } = await loginApi(credentials);
-
-      // Store tokens and user data
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-      localStorage.setItem("user", JSON.stringify(userData));
-
-      setUser(userData);
-      await fetchTokens(userData);
-
-      return { user: userData };
+      const response = await loginApi(credentials);
+      if (response?.user) {
+        setUser(response.user);
+        await fetchTokens(response.user);
+        return { user: response.user };
+      } else {
+        throw new Error("Login failed");
+      }
     } catch (error) {
       clearAuthData();
       throw error;
@@ -86,6 +88,7 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
+      await logoutApi();
       clearAuthData();
     } catch (error) {
       console.error("Logout failed:", error);

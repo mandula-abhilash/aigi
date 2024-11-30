@@ -1,4 +1,4 @@
-import { createAxiosInstance, tokenManager } from "visdak-aim";
+import api from "./axiosInstance";
 
 // Centralized API endpoints
 const ENDPOINTS = {
@@ -7,28 +7,6 @@ const ENDPOINTS = {
   GEO_IP: "/api/geo/ip",
   GEO_LOCATION: "/api/geo/location",
 };
-
-// Axios instance with configuration
-const api = createAxiosInstance({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-  timeout: 10000,
-  retryCount: 3,
-  retryDelay: 1000,
-  onUnauthorized: () => {
-    tokenManager.removeToken();
-    localStorage.removeItem("user");
-    window.location.href = "/";
-  },
-  onForbidden: () => {
-    console.error("Access forbidden");
-  },
-  onRetry: (retryCount) => {
-    console.log(`Retrying request (${retryCount})`);
-  },
-  defaultHeaders: {
-    "Content-Type": "application/json",
-  },
-});
 
 // Wrapper for getting field suggestions
 export const getFieldSuggestions = async (field, context = {}) => {
@@ -45,20 +23,8 @@ export const getFieldSuggestions = async (field, context = {}) => {
 
     return suggestions.filter(Boolean);
   } catch (error) {
-    if (error.response) {
-      console.error(
-        "Error fetching field suggestions (API):",
-        error.response.data
-      );
-    } else if (error.request) {
-      console.error(
-        "Error fetching field suggestions (Network):",
-        error.message
-      );
-    } else {
-      console.error("Error fetching field suggestions (Other):", error.message);
-    }
-    return [];
+    console.error("Error in getFieldSuggestions:", error);
+    throw error;
   }
 };
 

@@ -6,10 +6,8 @@ export const sesamConfig = {
   MONGODB_URI: process.env.MONGODB_URI,
   JWT_SECRET: process.env.JWT_SECRET,
   REFRESH_TOKEN_SECRET: process.env.REFRESH_TOKEN_SECRET,
-  // accessTokenExpiry: "15m",
-  accessTokenExpiry: "30s",
-  // refreshTokenExpiry: "7d",
-  refreshTokenExpiry: "1m",
+  ACCESS_TOKEN_EXPIRY: "900", // 15 minutes in seconds
+  REFRESH_TOKEN_EXPIRY: "604800", // 7 days in seconds
   emailConfig: {
     provider: "ses",
     from: process.env.SES_EMAIL_FROM,

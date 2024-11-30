@@ -1,28 +1,34 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-      {
-        "type": "node",
-        "request": "launch",
-        "name": "Launch AIGI Backend",
-        "program": "${workspaceFolder}/backend/server.js", 
-        "envFile": "${workspaceFolder}/backend/.env", 
-        "env": {
-          "NODE_ENV": "development"
-        },
-        "console": "integratedTerminal",
-        "internalConsoleOptions": "neverOpen",
-        "runtimeArgs": ["--inspect"],
-        "skipFiles": ["<node_internals>/**"]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch AIGI Frontend",
+      "request": "launch",
+      "type": "chrome",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/frontend"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch AIGI Backend",
+      "program": "${workspaceFolder}/backend/server.js",
+      "envFile": "${workspaceFolder}/backend/.env",
+      "env": {
+        "NODE_ENV": "development"
       },
-      {
-        "type": "node",
-        "request": "attach",
-        "name": "Attach to Process",
-        "port": 9229,
-        "restart": true,
-        "skipFiles": ["<node_internals>/**"]
-      }
-    ]
-  }
-  
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "runtimeArgs": ["--inspect"],
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "Attach to Process",
+      "port": 9229,
+      "restart": true,
+      "skipFiles": ["<node_internals>/**"]
+    }
+  ]
+}

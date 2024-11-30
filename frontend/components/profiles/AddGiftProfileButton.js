@@ -6,14 +6,20 @@ import { useAuth } from "@/contexts/AuthContext";
 
 export default function AddGiftProfileButton({ onProfileAdded }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  // Handle loading state if user data is being fetched
+  if (loading) return null;
 
   const handleProfileAdded = () => {
     setIsDialogOpen(false);
     onProfileAdded?.();
   };
 
-  if (!user?.role === "admin") return null;
+  // Adjust the role access path based on actual structure
+  const showButton = user?.role === "admin";
+
+  if (!showButton) return null;
 
   return (
     <>

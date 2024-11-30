@@ -102,7 +102,7 @@ export default function ProfilesPage() {
           </p>
         </div>
 
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-start mb-8">
           <SearchFilters onSearch={handleSearch} onFilter={handleFilter} />
           <AddGiftProfileButton onProfileAdded={fetchProfiles} />
         </div>
