@@ -71,12 +71,12 @@ export default function Header() {
                   <Coins className="w-4 h-4 text-blue-500" />
                   <span>{tokens} Tokens</span>
                 </Button>
-                <Link href="/saved">
+                {/* <Link href="/saved">
                   <Button variant="outline" className="flex items-center">
                     <BookmarkIcon className="w-4 h-4 mr-2 text-green-500" />
                     Saved Items
                   </Button>
-                </Link>
+                </Link> */}
                 <Button variant="outline" onClick={logout}>
                   <LogOut className="w-4 h-4 mr-2 text-red-500" />
                   Sign Out

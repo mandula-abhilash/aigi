@@ -19,6 +19,24 @@ const profileSchema = z.object({
   recipient: z.string().min(1, "Recipient is required"),
   occasion: z.string().min(1, "Occasion is required"),
   imageUrl: z.string().url("Must be a valid URL"),
+  // .refine(
+  //   (url) => {
+  //     const allowedDomains = [
+  //       "images.unsplash.com",
+  //       "source.unsplash.com",
+  //       "images.pexels.com",
+  //     ];
+  //     try {
+  //       const urlObj = new URL(url);
+  //       return allowedDomains.some((domain) => urlObj.hostname === domain);
+  //     } catch {
+  //       return false;
+  //     }
+  //   },
+  //   {
+  //     message: "Image URL must be from Unsplash or Pexels",
+  //   }
+  // )
   imageCredit: z.string().min(1, "Image credit is required"),
   description: z.string().min(10, "Description must be at least 10 characters"),
 });
@@ -26,6 +44,14 @@ const profileSchema = z.object({
 const productSchema = z.object({
   title: z.string().min(1, "Title is required"),
   link: z.string().url("Must be a valid URL"),
+  // .refine(
+  //   (url) =>
+  //     url.startsWith("https://amzn.to/") ||
+  //     url.startsWith("https://www.amazon."),
+  //   {
+  //     message: "Must be a valid Amazon affiliate link",
+  //   }
+  // ),
   description: z.string().min(10, "Description must be at least 10 characters"),
   keywords: z.array(z.string()).min(1, "At least one keyword is required"),
 });
@@ -161,7 +187,7 @@ export default function AddGiftProfileDialog({ isOpen, onClose, onSuccess }) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] h-[90vh] overflow-y-auto py-6">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto my-4">
         <DialogHeader>
           <DialogTitle>Add New Gift Profile</DialogTitle>
         </DialogHeader>
@@ -192,11 +218,11 @@ export default function AddGiftProfileDialog({ isOpen, onClose, onSuccess }) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="imageUrl">Image URL</Label>
+            <Label htmlFor="imageUrl">Image URL (Unsplash or Pexels)</Label>
             <Input
               id="imageUrl"
               {...register("imageUrl")}
-              placeholder="https://example.com/image.jpg"
+              placeholder="https://images.unsplash.com/... or https://images.pexels.com/..."
             />
             {errors.imageUrl && (
               <p className="text-sm text-red-500">{errors.imageUrl.message}</p>
@@ -283,7 +309,7 @@ export default function AddGiftProfileDialog({ isOpen, onClose, onSuccess }) {
                   }
                 />
                 <Input
-                  placeholder="Amazon Affiliate Link"
+                  placeholder="Amazon Affiliate Link (https://amzn.to/...)"
                   value={currentProduct.link}
                   onChange={(e) =>
                     setCurrentProduct({

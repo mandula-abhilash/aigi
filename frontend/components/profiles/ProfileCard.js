@@ -3,6 +3,7 @@ import { ExternalLink, Gift, Tag, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function ProfileCard({ profile }) {
   return (
@@ -15,10 +16,13 @@ export default function ProfileCard({ profile }) {
     >
       {/* Image Section */}
       <div className="relative h-48 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
-        <img
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-transparent z-10" />
+        <Image
           src={profile.image}
           alt={profile.title}
+          width={500}
+          height={300}
+          unoptimized
           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
         />
         {profile.imageCredit && (
@@ -26,7 +30,7 @@ export default function ProfileCard({ profile }) {
             {profile.imageCredit}
           </div>
         )}
-        <div className="absolute bottom-4 left-4 right-4 z-20">
+        <div className="absolute top-4 left-4 right-4 z-20">
           <h3 className="text-lg font-semibold text-white line-clamp-2">
             {profile.title}
           </h3>
@@ -58,13 +62,13 @@ export default function ProfileCard({ profile }) {
               View Gifts
             </Button>
           </Link>
-          <Button
+          {/* <Button
             variant="ghost"
             size="icon"
             className="text-gray-500 hover:text-primary"
           >
             <Heart className="w-4 h-4" />
-          </Button>
+          </Button> */}
         </div>
       </div>
     </motion.div>

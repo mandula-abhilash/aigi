@@ -10,6 +10,7 @@ import {
   CardDescription,
   CardContent,
 } from "@/components/ui/card";
+import Image from "next/image";
 
 export default function ProfilePageClient({ profile }) {
   if (!profile) {
@@ -39,9 +40,11 @@ export default function ProfilePageClient({ profile }) {
 
           {/* Profile Image */}
           <div className="relative h-64 md:h-96 rounded-xl overflow-hidden">
-            <img
+            <Image
               src={profile.image}
               alt={profile.title}
+              width={1200}
+              height={800}
               className="w-full h-full object-cover"
             />
             {profile.imageCredit && (

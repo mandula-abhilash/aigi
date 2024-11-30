@@ -72,8 +72,8 @@ export default function GiftCard({ suggestion }) {
               </div>
             </div>
           </div>
-
-          <Button
+          {/* TODO: Add Save Gift Suggestions */}
+          {/* <Button
             variant="ghost"
             size="icon"
             onClick={handleSave}
@@ -83,11 +83,16 @@ export default function GiftCard({ suggestion }) {
             <BookmarkPlus
               className={`h-5 w-5 ${isSaved ? "text-primary" : ""}`}
             />
-          </Button>
+          </Button> */}
         </div>
 
         <div className="mt-6 flex justify-end">
-          <a href={amazonSearchUrl} target="_blank" rel="noopener noreferrer">
+          <a
+            href={amazonSearchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm"
+          >
             <Button variant="outline" size="sm" className="gap-2">
               <ExternalLink className="h-4 w-4" />
               View on Amazon
