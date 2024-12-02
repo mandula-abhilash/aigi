@@ -2,7 +2,6 @@ import express from "express";
 import {
   verifySession,
   createCheckoutSession,
-  handleStripeWebhook,
 } from "../controllers/checkout.controller.js";
 
 const checkoutRoutes = ({ protect }) => {
@@ -21,17 +20,6 @@ const checkoutRoutes = ({ protect }) => {
    * @access Private
    */
   router.get("/verify/:sessionId", protect, verifySession);
-
-  /**
-   * @route POST /api/checkout/webhook
-   * @desc Handle Stripe webhook events
-   * @access Public
-   */
-  router.post(
-    "/webhook",
-    express.raw({ type: "application/json" }),
-    handleStripeWebhook
-  );
 
   return router;
 };

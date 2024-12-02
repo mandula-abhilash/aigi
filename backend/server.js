@@ -2,6 +2,7 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
+import bodyParser from "body-parser";
 import compression from "compression";
 import cookieParser from "cookie-parser";
 
@@ -11,7 +12,10 @@ import { createAuthModule } from "visdak-sesam";
 import geoRouter from "./routes/geo.routes.js";
 import createSuggestionsRouter from "./routes/suggestions.routes.js";
 import createGiftProfilesRouter from "./routes/gift.profiles.routes.js";
-import visdakWalletRoutes from "./visdak-wallet/index.js";
+
+import visdakWalletRoutes, {
+  handleStripeWebhook,
+} from "./visdak-wallet/index.js";
 
 const startServer = async () => {
   const app = express();
@@ -21,6 +25,18 @@ const startServer = async () => {
   app.use(cookieParser());
   app.use(helmet()); // Security headers
   app.use(compression()); // GZIP compression
+
+  /**
+   * @route POST /api/checkout/webhook
+   * @desc Handle Stripe webhook events
+   * @access Public
+   */
+  app.post(
+    "/api/checkout/webhook",
+    bodyParser.raw({ type: "application/json" }),
+    handleStripeWebhook
+  );
+
   app.use(express.json());
   app.use(morgan("combined")); // Logging HTTP requests
 

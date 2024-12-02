@@ -3,6 +3,7 @@ import walletRoutes from "./routes/wallet.routes.js";
 import subscriptionRoutes from "./routes/subscription.routes.js";
 import transactionRoutes from "./routes/transaction.routes.js";
 import checkoutRoutes from "./routes/checkout.routes.js";
+import { handleStripeWebhook } from "./controllers/checkout.controller.js";
 
 /**
  * Exports all the routes in one place
@@ -17,4 +18,5 @@ const visdakWalletRoutes = (middleware) => ({
   checkoutRoutes: checkoutRoutes(middleware),
 });
 
+export { handleStripeWebhook };
 export default visdakWalletRoutes;

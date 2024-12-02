@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 import { PlanModel } from "../models/plan.model.js";
+import { WalletModel } from "../models/wallet.model.js";
 import { TransactionModel } from "../models/transaction.model.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -103,8 +104,14 @@ export const handleStripeWebhook = async (req, res) => {
       case "checkout.session.completed":
         const session = event.data.object;
 
-        // Extract metadata and update the database
         const { userId, planId, type } = session.metadata;
+
+        const plan = await PlanModel.findById(planId);
+        if (!plan) {
+          console.error("Plan not found for webhook event");
+          return res.status(404).send("Plan not found");
+        }
+
         const transaction = new TransactionModel({
           userId,
           planId,
@@ -117,11 +124,30 @@ export const handleStripeWebhook = async (req, res) => {
         });
 
         await transaction.save();
-        console.log("Transaction recorded:", transaction);
+
+        // Update the user's wallet or subscription based on the plan type
+        if (type === "wallet-recharge") {
+          const wallet = await WalletModel.findOneAndUpdate(
+            { userId },
+            {
+              $inc: { balance: plan.tokens },
+              $push: { transactions: transaction._id },
+            },
+            { new: true, upsert: true }
+          );
+          console.log("Wallet updated:", wallet);
+        } else if (type === "subscription") {
+          console.log("Handle subscription logic here.");
+        } else {
+          console.log("One-time payment does not involve wallet updates.");
+        }
         break;
 
       default:
-        console.log(`Unhandled event type ${event.type}`);
+        if (process.env.NODE_ENV === "development") {
+          console.log(`Unhandled event type ${event.type}`);
+        }
+        break;
     }
 
     res.json({ received: true });
