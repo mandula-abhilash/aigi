@@ -34,8 +34,8 @@ export const createCheckoutSession = async (req, res) => {
         },
       ],
       mode: plan.type === "subscription" ? "subscription" : "payment",
-      success_url: `${process.env.APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.APP_URL}/cancel`,
+      success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.CLIENT_URL}/cancel`,
       metadata: {
         userId: req.user.userId,
         planId: plan._id.toString(),
@@ -46,6 +46,36 @@ export const createCheckoutSession = async (req, res) => {
     res.json({ sessionId: session.id });
   } catch (error) {
     console.error("Error creating checkout session:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+/**
+ * Verify a completed checkout session
+ */
+export const verifySession = async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+    if (!session) {
+      return res.status(404).json({ error: "Session not found" });
+    }
+
+    // Check if the session belongs to the current user
+    if (session.metadata.userId !== req.user.userId) {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
+    // Return session status and details
+    res.json({
+      status: session.status,
+      paymentStatus: session.payment_status,
+      planId: session.metadata.planId,
+      type: session.metadata.type,
+    });
+  } catch (error) {
+    console.error("Error verifying session:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

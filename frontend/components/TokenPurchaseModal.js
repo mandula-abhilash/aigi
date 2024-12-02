@@ -10,6 +10,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Coins, Check, Gift, Star, Crown } from "lucide-react";
+import { createCheckoutSession } from "@/services/checkout";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+);
 
 const tokenPlans = [
   {
@@ -20,6 +26,7 @@ const tokenPlans = [
     icon: Gift,
     color: "from-emerald-500 to-teal-600",
     features: ["Basic gift recommendations", "24/7 support"],
+    planId: "674d525261b8004913d92311",
   },
   {
     id: "pro",
@@ -29,6 +36,7 @@ const tokenPlans = [
     icon: Star,
     color: "from-violet-500 to-purple-600",
     features: ["Advanced AI suggestions", "Priority support", "Save searches"],
+    planId: "674d525261b8004913d92312",
   },
   {
     id: "enterprise",
@@ -42,6 +50,7 @@ const tokenPlans = [
       "Dedicated support",
       "Custom categories",
     ],
+    planId: "674d525261b8004913d92313",
   },
 ];
 
@@ -52,17 +61,32 @@ export default function TokenPurchaseModal({ isOpen, onClose }) {
   const handlePurchase = async (plan) => {
     try {
       setLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      toast({
-        title: "Success",
-        description: `Successfully purchased ${plan.tokens} tokens!`,
+      // Create checkout session
+      const { sessionId } = await createCheckoutSession({
+        planId: plan.planId,
+        paymentGateway: "stripe",
+        quantity: 1,
       });
-      onClose();
+
+      // Load Stripe and redirect to checkout
+      const stripe = await stripePromise;
+      if (!stripe) {
+        throw new Error("Failed to load Stripe");
+      }
+
+      const { error } = await stripe.redirectToCheckout({
+        sessionId,
+      });
+
+      if (error) {
+        throw error;
+      }
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to process purchase. Please try again.",
+        description:
+          error.message || "Failed to process purchase. Please try again.",
         variant: "destructive",
       });
     } finally {
