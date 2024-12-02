@@ -10,7 +10,8 @@ import { createAuthModule } from "visdak-sesam";
 
 import geoRouter from "./routes/geo.routes.js";
 import createSuggestionsRouter from "./routes/suggestions.routes.js";
-import createGiftProfilesRouter from "./routes/giftProfiles.routes.js";
+import createGiftProfilesRouter from "./routes/gift.profiles.routes.js";
+import visdakWalletRoutes from "./visdak-wallet/index.js";
 
 const startServer = async () => {
   const app = express();
@@ -43,6 +44,22 @@ const startServer = async () => {
 
     // Mount the gift profiles route
     app.use("/api/gift-profiles", createGiftProfilesRouter(middleware));
+
+    const {
+      planRoutes,
+      walletRoutes,
+      subscriptionRoutes,
+      transactionRoutes,
+      checkoutRoutes,
+    } = visdakWalletRoutes(middleware);
+
+    // Mount the visdak wallet routes
+
+    app.use("/api/plans", planRoutes);
+    app.use("/api/wallet", walletRoutes);
+    app.use("/api/subscriptions", subscriptionRoutes);
+    app.use("/api/transactions", transactionRoutes);
+    app.use("/api/checkout", checkoutRoutes);
 
     // Example of a protected route
     app.get("/api/protected", middleware.protect, (req, res) => {

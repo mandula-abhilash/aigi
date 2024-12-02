@@ -1,0 +1,102 @@
+import Stripe from "stripe";
+import { PlanModel } from "../models/plan.model.js";
+import { TransactionModel } from "../models/transaction.model.js";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+/**
+ * Create a Stripe Checkout Session
+ */
+export const createCheckoutSession = async (req, res) => {
+  try {
+    const { planId } = req.body;
+
+    // Fetch the plan from the database
+    const plan = await PlanModel.findById(planId);
+    if (!plan || !plan.isActive) {
+      return res.status(404).json({ error: "Plan not found or inactive" });
+    }
+
+    // Create a checkout session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: plan.currency.toLowerCase(),
+            product_data: {
+              name: plan.name,
+              description: `Plan Type: ${plan.type}`,
+            },
+            unit_amount: plan.price * 100, // Stripe expects amount in cents
+          },
+          quantity: 1,
+        },
+      ],
+      mode: plan.type === "subscription" ? "subscription" : "payment",
+      success_url: `${process.env.APP_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.APP_URL}/cancel`,
+      metadata: {
+        userId: req.user.userId,
+        planId: plan._id.toString(),
+        type: plan.type,
+      },
+    });
+
+    res.json({ sessionId: session.id });
+  } catch (error) {
+    console.error("Error creating checkout session:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+/**
+ * Handle Stripe Webhook Events
+ */
+export const handleStripeWebhook = async (req, res) => {
+  const sig = req.headers["stripe-signature"];
+
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (error) {
+    console.error("Webhook signature verification failed:", error);
+    return res.status(400).send(`Webhook Error: ${error.message}`);
+  }
+
+  try {
+    switch (event.type) {
+      case "checkout.session.completed":
+        const session = event.data.object;
+
+        // Extract metadata and update the database
+        const { userId, planId, type } = session.metadata;
+        const transaction = new TransactionModel({
+          userId,
+          planId,
+          amount: session.amount_total / 100, // Convert cents to currency
+          currency: session.currency.toUpperCase(),
+          type,
+          flow: "credit",
+          paymentGateway: "stripe",
+          status: "completed",
+        });
+
+        await transaction.save();
+        console.log("Transaction recorded:", transaction);
+        break;
+
+      default:
+        console.log(`Unhandled event type ${event.type}`);
+    }
+
+    res.json({ received: true });
+  } catch (error) {
+    console.error("Error handling webhook event:", error);
+    res.status(500).send("Internal server error");
+  }
+};

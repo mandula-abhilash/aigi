@@ -96,11 +96,11 @@ const giftProfileSchema = new Schema(
   },
   {
     timestamps: true,
-    collection: "giftProfiles",
+    collection: "gift_profiles",
     toJSON: {
       virtuals: true,
       transform: (doc, ret) => {
-        delete ret.__v; // Remove Mongoose version key
+        delete ret.__v;
         return ret;
       },
     },

@@ -5,7 +5,7 @@ import {
   getGiftProfileById,
   updateGiftProfile,
   deleteGiftProfile,
-} from "../controllers/giftProfiles.controller.js";
+} from "../controllers/gift.profiles.controller.js";
 
 /**
  * Function to create the gift profiles router with middleware.

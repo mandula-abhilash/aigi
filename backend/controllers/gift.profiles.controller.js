@@ -1,4 +1,4 @@
-import { GiftProfileModel } from "../models/giftProfile.model.js";
+import { GiftProfileModel } from "../models/gift.profile.model.js";
 
 /**
  * Create a new gift profile
