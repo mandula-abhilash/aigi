@@ -6,6 +6,7 @@ import {
   checkSession,
   logout as logoutApi,
 } from "@/services/auth";
+import { getWalletDetails } from "@/services/wallet";
 
 const defaultContext = {
   user: null,
@@ -32,7 +33,7 @@ export function AuthProvider({ children }) {
         const user = response?.data?.user;
         if (isMounted && user) {
           setUser(user);
-          await fetchTokens(user);
+          await fetchTokens();
         } else {
           if (isMounted) {
             clearAuthData();
@@ -61,12 +62,13 @@ export function AuthProvider({ children }) {
     setTokens(0);
   };
 
-  const fetchTokens = async (user) => {
-    if (!user) return;
+  const fetchTokens = async () => {
     try {
-      setTokens(100);
+      const walletData = await getWalletDetails();
+      setTokens(walletData.balance || 0);
     } catch (error) {
       console.error("Failed to fetch tokens:", error);
+      setTokens(0);
     }
   };
 
@@ -75,7 +77,7 @@ export function AuthProvider({ children }) {
       const response = await loginApi(credentials);
       if (response?.user) {
         setUser(response.user);
-        await fetchTokens(response.user);
+        await fetchTokens();
         return { user: response.user };
       } else {
         throw new Error("Login failed");

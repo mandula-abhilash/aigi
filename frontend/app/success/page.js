@@ -7,12 +7,14 @@ import { Check, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { verifyPaymentSession } from "@/services/checkout";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function SuccessPage() {
   const [loading, setLoading] = useState(true);
   const searchParams = useSearchParams();
   const router = useRouter();
   const { toast } = useToast();
+  const { fetchTokens } = useAuth();
   const sessionId = searchParams.get("session_id");
 
   useEffect(() => {
@@ -24,6 +26,7 @@ export default function SuccessPage() {
     const verifyPayment = async () => {
       try {
         const response = await verifyPaymentSession(sessionId);
+        await fetchTokens(); // Refresh token count after successful payment
         toast({
           title: "Payment Successful",
           description: "Your tokens have been added to your account!",
@@ -41,7 +44,7 @@ export default function SuccessPage() {
     };
 
     verifyPayment();
-  }, [sessionId, router, toast]);
+  }, [sessionId, router, toast, fetchTokens]);
 
   if (loading) {
     return (

@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Coins, Check, Gift, Star, Crown } from "lucide-react";
 import { createCheckoutSession } from "@/services/checkout";
 import { loadStripe } from "@stripe/stripe-js";
+import { useAuth } from "@/contexts/AuthContext";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -57,6 +58,7 @@ const tokenPlans = [
 export default function TokenPurchaseModal({ isOpen, onClose }) {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { fetchTokens } = useAuth();
 
   const handlePurchase = async (plan) => {
     try {
