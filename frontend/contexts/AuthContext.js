@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import {
   login as loginApi,
   checkSession,
@@ -23,6 +29,28 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [tokens, setTokens] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [tokenLoading, setTokenLoading] = useState(false);
+
+  const fetchTokens = useCallback(async () => {
+    if (!user) return;
+
+    try {
+      setTokenLoading(true);
+      const walletData = await getWalletDetails();
+      if (walletData?.balance !== undefined) {
+        setTokens(walletData.balance);
+      }
+    } catch (error) {
+      console.error("Failed to fetch tokens:", error);
+    } finally {
+      setTokenLoading(false);
+    }
+  }, [user]);
+
+  const clearAuthData = () => {
+    setUser(null);
+    setTokens(0);
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -30,14 +58,11 @@ export function AuthProvider({ children }) {
     const checkAuth = async () => {
       try {
         const response = await checkSession();
-        const user = response?.data?.user;
-        if (isMounted && user) {
-          setUser(user);
-          await fetchTokens();
-        } else {
-          if (isMounted) {
-            clearAuthData();
-          }
+        const userData = response?.data?.user;
+        if (isMounted && userData) {
+          setUser(userData);
+        } else if (isMounted) {
+          clearAuthData();
         }
       } catch (error) {
         if (isMounted) {
@@ -57,27 +82,18 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
-  const clearAuthData = () => {
-    setUser(null);
-    setTokens(0);
-  };
-
-  const fetchTokens = async () => {
-    try {
-      const walletData = await getWalletDetails();
-      setTokens(walletData.balance || 0);
-    } catch (error) {
-      console.error("Failed to fetch tokens:", error);
-      setTokens(0);
+  // Separate useEffect for fetching tokens when user changes
+  useEffect(() => {
+    if (user) {
+      fetchTokens();
     }
-  };
+  }, [user, fetchTokens]);
 
   const login = async (credentials) => {
     try {
       const response = await loginApi(credentials);
       if (response?.user) {
         setUser(response.user);
-        await fetchTokens();
         return { user: response.user };
       } else {
         throw new Error("Login failed");
@@ -102,6 +118,7 @@ export function AuthProvider({ children }) {
     user,
     tokens,
     loading,
+    tokenLoading,
     login,
     logout,
     fetchTokens,
