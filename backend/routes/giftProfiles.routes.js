@@ -19,10 +19,10 @@ const createGiftProfilesRouter = (middleware) => {
   router.post("/", middleware.protect, middleware.admin, createGiftProfile);
 
   // Get all gift profiles (Protected)
-  router.get("/", middleware.protect, getGiftProfiles);
+  router.get("/", getGiftProfiles);
 
   // Get a single gift profile by ID (Protected)
-  router.get("/:id", middleware.protect, getGiftProfileById);
+  router.get("/:id", getGiftProfileById);
 
   // Update a gift profile by ID (Admin only)
   router.put("/:id", middleware.protect, middleware.admin, updateGiftProfile);

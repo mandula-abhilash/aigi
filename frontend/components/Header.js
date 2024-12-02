@@ -85,7 +85,7 @@ export default function Header() {
             ) : (
               <>
                 <Button
-                  variant="ghost"
+                  variant="default"
                   onClick={() => openAuth("login")}
                   className="flex items-center"
                 >
