@@ -1,77 +1,100 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { Coins, Check, Gift, Star, Crown } from "lucide-react";
+import { Coins, Check, Gift, Star, Crown, Loader2 } from "lucide-react";
 import { createCheckoutSession } from "@/services/checkout";
 import { loadStripe } from "@stripe/stripe-js";
-import { useAuth } from "@/contexts/AuthContext";
+import { getActivePlans } from "@/services/plans";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { motion } from "framer-motion";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 );
 
-const tokenPlans = [
-  {
-    id: "basic",
-    tokens: 10,
-    price: 9.99,
-    popular: false,
+const planStyles = {
+  "Starter Plan": {
     icon: Gift,
-    color: "from-emerald-500 to-teal-600",
-    features: ["Basic gift recommendations", "24/7 support"],
-    planId: "674d525261b8004913d92311",
+    bgColor: "bg-emerald-50 dark:bg-emerald-950/30",
+    iconColor: "text-emerald-500",
   },
-  {
-    id: "pro",
-    tokens: 100,
-    price: 49.99,
-    popular: true,
+  "Premium Plan": {
     icon: Star,
-    color: "from-violet-500 to-purple-600",
-    features: ["Advanced AI suggestions", "Priority support", "Save searches"],
-    planId: "674d525261b8004913d92312",
+    bgColor: "bg-violet-50 dark:bg-violet-950/30",
+    iconColor: "text-violet-500",
   },
-  {
-    id: "enterprise",
-    tokens: 500,
-    price: 199.99,
-    popular: false,
+  "Enterprise Plan": {
     icon: Crown,
-    color: "from-amber-500 to-orange-600",
-    features: [
-      "Unlimited recommendations",
-      "Dedicated support",
-      "Custom categories",
-    ],
-    planId: "674d525261b8004913d92313",
+    bgColor: "bg-amber-50 dark:bg-amber-950/30",
+    iconColor: "text-amber-500",
   },
-];
+};
+
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 },
+  hover: { scale: 1.02 },
+};
 
 export default function TokenPurchaseModal({ isOpen, onClose }) {
   const [loading, setLoading] = useState(false);
+  const [plans, setPlans] = useState([]);
+  const [loadingPlans, setLoadingPlans] = useState(true);
   const { toast } = useToast();
-  const { fetchTokens } = useAuth();
+  const { currencySymbol } = useCurrency();
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        setLoadingPlans(true);
+        const activePlans = await getActivePlans();
+        setPlans(activePlans);
+      } catch (error) {
+        console.error("Error in fetchPlans:", error);
+        toast({
+          title: "Error",
+          description: error.message || "Failed to load pricing plans",
+          variant: "destructive",
+        });
+        setPlans([]);
+      } finally {
+        setLoadingPlans(false);
+      }
+    };
+
+    if (isOpen) {
+      fetchPlans();
+    }
+  }, [isOpen, toast]);
 
   const handlePurchase = async (plan) => {
     try {
       setLoading(true);
-
-      // Create checkout session
       const { sessionId } = await createCheckoutSession({
-        planId: plan.planId,
+        planId: plan._id,
         paymentGateway: "stripe",
         quantity: 1,
       });
 
-      // Load Stripe and redirect to checkout
       const stripe = await stripePromise;
       if (!stripe) {
         throw new Error("Failed to load Stripe");
@@ -85,6 +108,7 @@ export default function TokenPurchaseModal({ isOpen, onClose }) {
         throw error;
       }
     } catch (error) {
+      console.error("Purchase error:", error);
       toast({
         title: "Error",
         description:
@@ -96,69 +120,140 @@ export default function TokenPurchaseModal({ isOpen, onClose }) {
     }
   };
 
+  if (loadingPlans) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Loading Plans</DialogTitle>
+            <DialogDescription>
+              Please wait while we fetch available plans...
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center items-center h-48">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  if (!plans.length) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>No Plans Available</DialogTitle>
+            <DialogDescription>
+              Sorry, there are no plans available at the moment.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end mt-4">
+            <Button onClick={onClose}>Close</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[800px] p-6">
-        <DialogHeader>
-          <DialogTitle className="text-3xl font-bold text-center mb-2">
+        <DialogHeader className="mb-8">
+          <DialogTitle className="text-3xl font-bold text-center">
             Purchase Tokens
           </DialogTitle>
-          <p className="text-center text-gray-600 dark:text-gray-400">
+          <DialogDescription className="text-center text-base">
             Choose the perfect plan for your gifting needs
-          </p>
+          </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-          {tokenPlans.map((plan) => {
-            const PlanIcon = plan.icon;
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6"
+        >
+          {plans.map((plan) => {
+            const {
+              icon: PlanIcon,
+              bgColor,
+              iconColor,
+            } = planStyles[plan.name] || {
+              icon: Gift,
+              bgColor: "bg-gray-50 dark:bg-gray-800",
+              iconColor: "text-gray-500",
+            };
+            const isPopular = plan.name === "Premium Plan";
+
             return (
-              <div
-                key={plan.id}
-                className={`relative rounded-2xl overflow-hidden transition-transform hover:scale-105 ${
-                  plan.popular ? "ring-2 ring-violet-500 shadow-lg" : ""
+              <motion.div
+                key={plan._id}
+                variants={item}
+                whileHover="hover"
+                className={`relative rounded-xl overflow-hidden transition-all duration-300 ${bgColor} ${
+                  isPopular
+                    ? "ring-2 ring-primary shadow-lg"
+                    : "hover:shadow-md"
                 }`}
               >
-                {plan.popular && (
+                {isPopular && (
                   <div className="absolute top-0 left-0 right-0">
-                    <div className="bg-violet-500 text-white text-sm font-medium px-4 py-1 text-center transform">
+                    <div className="bg-primary/10 backdrop-blur-sm text-primary text-sm font-medium px-4 py-1 text-center">
                       Most Popular
                     </div>
                   </div>
                 )}
 
-                <div
-                  className={`bg-gradient-to-br ${plan.color} p-6 text-white h-full flex flex-col`}
-                >
+                <div className="p-6 h-full flex flex-col">
                   <div className="text-center mb-6">
                     <div className="flex justify-center mb-4">
-                      <PlanIcon className="w-12 h-12" />
+                      <div
+                        className={`${iconColor} bg-white dark:bg-gray-800 p-3 rounded-full shadow-sm`}
+                      >
+                        <PlanIcon className="w-8 h-8" />
+                      </div>
                     </div>
-                    <h3 className="text-2xl font-bold mb-2">
-                      {plan.tokens} Tokens
-                    </h3>
-                    <div className="flex items-center justify-center gap-1">
-                      <span className="text-3xl font-bold">${plan.price}</span>
+                    <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
+                    <div className="flex items-center justify-center gap-1 mb-2">
+                      <span className="text-3xl font-bold">
+                        {currencySymbol}
+                        {plan.price}
+                      </span>
                     </div>
+                    <p className="text-sm text-muted-foreground">
+                      {plan.tokens} tokens included
+                    </p>
                   </div>
 
                   <ul className="space-y-3 mb-6 flex-grow">
-                    {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-center gap-2">
-                        <Check className="w-5 h-5 flex-shrink-0" />
-                        <span className="text-sm">{feature}</span>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-5 h-5 flex-shrink-0 text-primary" />
+                      <span className="text-sm">
+                        {plan.tokens} AI gift suggestions
+                      </span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-5 h-5 flex-shrink-0 text-primary" />
+                      <span className="text-sm">24/7 support</span>
+                    </li>
+                    {isPopular && (
+                      <li className="flex items-center gap-2">
+                        <Check className="w-5 h-5 flex-shrink-0 text-primary" />
+                        <span className="text-sm">Priority support</span>
                       </li>
-                    ))}
+                    )}
                   </ul>
 
                   <Button
                     onClick={() => handlePurchase(plan)}
                     disabled={loading}
-                    className={`w-full bg-white/20 hover:bg-white/30 text-white border-2 border-white/50 
-                      hover:border-white transition-all duration-200`}
+                    variant={isPopular ? "default" : "outline"}
+                    className="w-full"
                   >
                     {loading ? (
                       <span className="flex items-center gap-2">
-                        <Coins className="w-4 h-4 animate-bounce" />
+                        <Loader2 className="w-4 h-4 animate-spin" />
                         Processing...
                       </span>
                     ) : (
@@ -169,10 +264,10 @@ export default function TokenPurchaseModal({ isOpen, onClose }) {
                     )}
                   </Button>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </DialogContent>
     </Dialog>
   );
