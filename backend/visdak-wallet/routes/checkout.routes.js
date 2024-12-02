@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  verifySession,
   createCheckoutSession,
   handleStripeWebhook,
 } from "../controllers/checkout.controller.js";
@@ -13,6 +14,13 @@ const checkoutRoutes = ({ protect }) => {
    * @access Private
    */
   router.post("/session", protect, createCheckoutSession);
+
+  /**
+   * @route GET /api/checkout/verify/:sessionId
+   * @desc Verify a completed checkout session
+   * @access Private
+   */
+  router.get("/verify/:sessionId", protect, verifySession);
 
   /**
    * @route POST /api/checkout/webhook
