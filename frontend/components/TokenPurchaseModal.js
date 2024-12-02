@@ -56,7 +56,7 @@ const item = {
 };
 
 export default function TokenPurchaseModal({ isOpen, onClose }) {
-  const [loading, setLoading] = useState(false);
+  const [loadingPlanId, setLoadingPlanId] = useState(null);
   const [plans, setPlans] = useState([]);
   const [loadingPlans, setLoadingPlans] = useState(true);
   const { toast } = useToast();
@@ -88,7 +88,7 @@ export default function TokenPurchaseModal({ isOpen, onClose }) {
 
   const handlePurchase = async (plan) => {
     try {
-      setLoading(true);
+      setLoadingPlanId(plan._id);
       const { sessionId } = await createCheckoutSession({
         planId: plan._id,
         paymentGateway: "stripe",
@@ -115,28 +115,11 @@ export default function TokenPurchaseModal({ isOpen, onClose }) {
           error.message || "Failed to process purchase. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
+      setLoadingPlanId(null);
     }
   };
 
-  if (loadingPlans) {
-    return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>Loading Plans</DialogTitle>
-            <DialogDescription>
-              Please wait while we fetch available plans...
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-center items-center h-48">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
+  if (loadingPlans) return null;
 
   if (!plans.length) {
     return (
@@ -185,6 +168,7 @@ export default function TokenPurchaseModal({ isOpen, onClose }) {
               iconColor: "text-gray-500",
             };
             const isPopular = plan.name === "Premium Plan";
+            const isLoading = loadingPlanId === plan._id;
 
             return (
               <motion.div
@@ -247,11 +231,11 @@ export default function TokenPurchaseModal({ isOpen, onClose }) {
 
                   <Button
                     onClick={() => handlePurchase(plan)}
-                    disabled={loading}
+                    disabled={isLoading || loadingPlanId !== null}
                     variant={isPopular ? "default" : "outline"}
                     className="w-full"
                   >
-                    {loading ? (
+                    {isLoading ? (
                       <span className="flex items-center gap-2">
                         <Loader2 className="w-4 h-4 animate-spin" />
                         Processing...

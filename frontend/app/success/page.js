@@ -25,8 +25,8 @@ export default function SuccessPage() {
 
     const verifyPayment = async () => {
       try {
-        const response = await verifyPaymentSession(sessionId);
-        await fetchTokens(); // Refresh token count after successful payment
+        await verifyPaymentSession(sessionId);
+        await fetchTokens();
         toast({
           title: "Payment Successful",
           description: "Your tokens have been added to your account!",
@@ -49,10 +49,12 @@ export default function SuccessPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        <p className="text-center text-gray-600 dark:text-gray-400">
-          Verifying your payment, please wait...
-        </p>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">
+            Verifying your payment, please wait...
+          </p>
+        </div>
       </div>
     );
   }

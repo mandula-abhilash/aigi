@@ -3,15 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import {
-  Menu,
-  X,
-  Coins,
-  LogOut,
-  UserPlus,
-  LogIn,
-  BookmarkIcon,
-} from "lucide-react";
+import { Menu, X, Coins, LogOut, UserPlus, LogIn, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import TokenPurchaseModal from "@/components/TokenPurchaseModal";
 import MobileMenu from "@/components/MobileMenu";
@@ -21,7 +13,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 export default function Header() {
-  const { user, tokens, logout } = useAuth();
+  const { user, tokens, tokenLoading, logout } = useAuth();
   const { currency, currencySymbol } = useCurrency();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isTokenModalOpen, setIsTokenModalOpen] = useState(false);
@@ -68,15 +60,15 @@ export default function Header() {
                   onClick={() => setIsTokenModalOpen(true)}
                   className="flex items-center space-x-2"
                 >
-                  <Coins className="w-4 h-4 text-blue-500" />
-                  <span>{tokens} Tokens</span>
+                  {tokenLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
+                  ) : (
+                    <>
+                      <Coins className="w-4 h-4 text-blue-500" />
+                      <span>{tokens} Tokens</span>
+                    </>
+                  )}
                 </Button>
-                {/* <Link href="/saved">
-                  <Button variant="outline" className="flex items-center">
-                    <BookmarkIcon className="w-4 h-4 mr-2 text-green-500" />
-                    Saved Items
-                  </Button>
-                </Link> */}
                 <Button variant="outline" onClick={logout}>
                   <LogOut className="w-4 h-4 mr-2 text-red-500" />
                   Sign Out
