@@ -25,6 +25,7 @@
     "helmet": "^8.0.0",
     "openai": "^4.73.0",
     "stripe": "^17.4.0",
-    "visdak-sesam": "github:mandula-abhilash/visdak-sesam"
+    "visdak-sesam": "github:mandula-abhilash/visdak-sesam",
+    "visdak-wallet": "github:mandula-abhilash/visdak-wallet"
   }
 }

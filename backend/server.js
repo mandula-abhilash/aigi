@@ -13,9 +13,7 @@ import geoRouter from "./routes/geo.routes.js";
 import createSuggestionsRouter from "./routes/suggestions.routes.js";
 import createGiftProfilesRouter from "./routes/gift.profiles.routes.js";
 
-import visdakWalletRoutes, {
-  handleStripeWebhook,
-} from "./visdak-wallet/index.js";
+import visdakWalletRoutes, { handleStripeWebhook } from "visdak-wallet";
 
 const startServer = async () => {
   const app = express();
