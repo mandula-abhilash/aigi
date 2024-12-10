@@ -161,9 +161,12 @@ export default function GiftSearchForm() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-        <div className="grid gap-6">
+    <div className="mx-auto px-4">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="max-w-4xl bg-gray-100 shadow-lg p-4 md:p-8 lg:p-12 mx-auto space-y-8 rounded-md"
+      >
+        <div className="grid gap-6 max-w-4xl">
           <AIFormField
             id="recipient"
             label="Who is this gift for?"

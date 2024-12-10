@@ -1,31 +1,8 @@
-"use client";
-
-import { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Gift,
-  Tag,
-  Users,
-  BookmarkPlus,
-  ExternalLink,
-  FolderIcon,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { Gift, Tag, Users, FolderIcon, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-export default function GiftCard({ suggestion }) {
-  const [isSaved, setIsSaved] = useState(false);
-  const { toast } = useToast();
-
-  const handleSave = () => {
-    setIsSaved(true);
-    toast({
-      title: "Gift Saved",
-      description: "This gift has been added to your saved items.",
-    });
-  };
-
+export default function GiftCard({ suggestion, index }) {
   // Construct the Amazon affiliate link
   const amazonSearchUrl = `https://${
     process.env.NEXT_PUBLIC_AMAZON_DOMAIN
@@ -34,72 +11,73 @@ export default function GiftCard({ suggestion }) {
   }`;
 
   return (
-    <div className="w-full bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-      <div className="p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-4">
-              {/* <Gift className="h-5 w-5 text-primary shrink-0" /> */}
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {suggestion.gift}
-              </h3>
+    <motion.div
+      whileHover={{ y: -5 }}
+      className="relative h-full overflow-hidden bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 flex flex-col"
+    >
+      {/* Decorative Elements */}
+      <div className="absolute top-0 right-0 w-40 h-40 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+      <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+
+      <div className="relative p-6 md:p-8 flex flex-col flex-1">
+        {/* Content Section */}
+        <div className="flex-1 space-y-4">
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+              {suggestion.gift}
+            </h3>
+
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <Users className="h-4 w-4" />
+              <span>{suggestion.demographic}</span>
             </div>
 
-            <div className="space-y-3">
-              <div className="flex items-start gap-2">
-                <Tag className="h-4 w-4 text-gray-500 mt-1 shrink-0" />
-                <div className="flex flex-wrap gap-1">
-                  {suggestion.keywords.split(",").map((keyword, i) => (
-                    <Badge
-                      key={i}
-                      variant="secondary"
-                      className="text-xs px-2 py-0.5"
-                    >
-                      {keyword.trim()}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                <Users className="h-4 w-4 shrink-0" />
-                <span>{suggestion.demographic}</span>
-              </div>
-
-              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-                <FolderIcon className="h-4 w-4 shrink-0" />
-                <span>{suggestion.category}</span>
-              </div>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+              <FolderIcon className="h-4 w-4" />
+              <span>{suggestion.category}</span>
             </div>
           </div>
-          {/* TODO: Add Save Gift Suggestions */}
-          {/* <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleSave}
-            disabled={isSaved}
-            className="text-gray-500 hover:text-primary shrink-0"
-          >
-            <BookmarkPlus
-              className={`h-5 w-5 ${isSaved ? "text-primary" : ""}`}
-            />
-          </Button> */}
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Tag className="h-4 w-4 text-primary/60" />
+            {suggestion.keywords.split(",").map((keyword, i) => (
+              <Badge
+                key={i}
+                variant="secondary"
+                className="bg-primary/5 text-primary hover:bg-primary/10 transition-colors"
+              >
+                {keyword.trim()}
+              </Badge>
+            ))}
+          </div>
         </div>
 
-        <div className="mt-6 flex justify-end">
-          <a
+        {/* Action Section */}
+        <div className="mt-6 pt-6 border-t border-gray-100 dark:border-gray-700">
+          <motion.a
             href={amazonSearchUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm"
+            className="relative inline-flex group w-full"
+            whileHover="hover"
+            whileTap="tap"
+            initial="rest"
+            variants={{
+              rest: { scale: 1 },
+              hover: { scale: 1.02 },
+              tap: { scale: 0.98 },
+            }}
           >
-            <Button variant="outline" size="sm" className="gap-2">
-              <ExternalLink className="h-4 w-4" />
-              View on Amazon
-            </Button>
-          </a>
+            {/* Gradient Glow */}
+            <div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 opacity-70 blur-lg transition-all duration-300 group-hover:opacity-100" />
+            {/* Button */}
+            <div className="relative w-full flex items-center justify-center gap-2 px-4 py-3 font-bold text-white bg-gradient-to-br from-yellow-500 to-orange-600 rounded-lg leading-none shadow-md hover:shadow-lg">
+              <span className="font-semibold text-sm">View on Amazon</span>
+              <ExternalLink className="w-4 h-4" />
+            </div>
+          </motion.a>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
