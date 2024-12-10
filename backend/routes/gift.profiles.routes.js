@@ -5,6 +5,7 @@ import {
   getGiftProfileById,
   updateGiftProfile,
   deleteGiftProfile,
+  addProductToProfile,
 } from "../controllers/gift.profiles.controller.js";
 
 /**
@@ -17,6 +18,14 @@ const createGiftProfilesRouter = (middleware) => {
 
   // Create a gift profile (Admin only)
   router.post("/", middleware.protect, middleware.admin, createGiftProfile);
+
+  // Add a product to a gift profile (Admin only)
+  router.post(
+    "/:id/products",
+    middleware.protect,
+    middleware.admin,
+    addProductToProfile
+  );
 
   // Get all gift profiles (Protected)
   router.get("/", getGiftProfiles);

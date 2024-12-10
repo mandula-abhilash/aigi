@@ -11,62 +11,24 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, X, Plus } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { createGiftProfile } from "@/services/profiles";
 
 const profileSchema = z.object({
   recipient: z.string().min(1, "Recipient is required"),
   occasion: z.string().min(1, "Occasion is required"),
   imageUrl: z.string().url("Must be a valid URL"),
-  // .refine(
-  //   (url) => {
-  //     const allowedDomains = [
-  //       "images.unsplash.com",
-  //       "source.unsplash.com",
-  //       "images.pexels.com",
-  //     ];
-  //     try {
-  //       const urlObj = new URL(url);
-  //       return allowedDomains.some((domain) => urlObj.hostname === domain);
-  //     } catch {
-  //       return false;
-  //     }
-  //   },
-  //   {
-  //     message: "Image URL must be from Unsplash or Pexels",
-  //   }
-  // )
-  imageCredit: z.string().min(1, "Image credit is required"),
+  creditAuthor: z.string().min(1, "Image credit author is required"),
+  creditAuthorLink: z.string().url("Must be a valid URL"),
+  creditPlatformLink: z.string().url("Must be a valid URL"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-});
-
-const productSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  link: z.string().url("Must be a valid URL"),
-  // .refine(
-  //   (url) =>
-  //     url.startsWith("https://amzn.to/") ||
-  //     url.startsWith("https://www.amazon."),
-  //   {
-  //     message: "Must be a valid Amazon affiliate link",
-  //   }
-  // ),
-  description: z.string().min(10, "Description must be at least 10 characters"),
-  keywords: z.array(z.string()).min(1, "At least one keyword is required"),
 });
 
 export default function AddGiftProfileDialog({ isOpen, onClose, onSuccess }) {
   const [interests, setInterests] = useState([]);
   const [currentInterest, setCurrentInterest] = useState("");
-  const [products, setProducts] = useState([]);
-  const [currentProduct, setCurrentProduct] = useState({
-    title: "",
-    link: "",
-    description: "",
-    keywords: [],
-  });
-  const [currentKeyword, setCurrentKeyword] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -90,63 +52,11 @@ export default function AddGiftProfileDialog({ isOpen, onClose, onSuccess }) {
     setInterests(interests.filter((i) => i !== interest));
   };
 
-  const handleAddKeyword = () => {
-    if (
-      currentKeyword.trim() &&
-      !currentProduct.keywords.includes(currentKeyword.trim())
-    ) {
-      setCurrentProduct({
-        ...currentProduct,
-        keywords: [...currentProduct.keywords, currentKeyword.trim()],
-      });
-      setCurrentKeyword("");
-    }
-  };
-
-  const handleRemoveKeyword = (keyword) => {
-    setCurrentProduct({
-      ...currentProduct,
-      keywords: currentProduct.keywords.filter((k) => k !== keyword),
-    });
-  };
-
-  const handleAddProduct = () => {
-    try {
-      const validatedProduct = productSchema.parse(currentProduct);
-      setProducts([...products, validatedProduct]);
-      setCurrentProduct({
-        title: "",
-        link: "",
-        description: "",
-        keywords: [],
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: error.errors?.[0]?.message || "Invalid product data",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleRemoveProduct = (index) => {
-    setProducts(products.filter((_, i) => i !== index));
-  };
-
   const onSubmit = async (data) => {
     if (interests.length === 0) {
       toast({
         title: "Error",
         description: "Please add at least one interest",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (products.length === 0) {
-      toast({
-        title: "Error",
-        description: "Please add at least one product",
         variant: "destructive",
       });
       return;
@@ -160,9 +70,10 @@ export default function AddGiftProfileDialog({ isOpen, onClose, onSuccess }) {
         title,
         description: data.description,
         image: data.imageUrl,
-        imageCredit: data.imageCredit,
+        creditAuthor: data.creditAuthor,
+        creditAuthorLink: data.creditAuthorLink,
+        creditPlatformLink: data.creditPlatformLink,
         interests,
-        products,
       });
 
       toast({
@@ -172,7 +83,6 @@ export default function AddGiftProfileDialog({ isOpen, onClose, onSuccess }) {
 
       reset();
       setInterests([]);
-      setProducts([]);
       onSuccess?.();
     } catch (error) {
       toast({
@@ -218,11 +128,11 @@ export default function AddGiftProfileDialog({ isOpen, onClose, onSuccess }) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="imageUrl">Image URL (Unsplash or Pexels)</Label>
+            <Label htmlFor="imageUrl">Image URL</Label>
             <Input
               id="imageUrl"
               {...register("imageUrl")}
-              placeholder="https://images.unsplash.com/... or https://images.pexels.com/..."
+              placeholder="https://images.unsplash.com/..."
             />
             {errors.imageUrl && (
               <p className="text-sm text-red-500">{errors.imageUrl.message}</p>
@@ -230,22 +140,50 @@ export default function AddGiftProfileDialog({ isOpen, onClose, onSuccess }) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="imageCredit">Image Credit</Label>
+            <Label htmlFor="creditAuthor">Image Credit Author</Label>
             <Input
-              id="imageCredit"
-              {...register("imageCredit")}
-              placeholder="e.g., Photo by John Doe on Unsplash"
+              id="creditAuthor"
+              {...register("creditAuthor")}
+              placeholder="e.g., John Doe"
             />
-            {errors.imageCredit && (
+            {errors.creditAuthor && (
               <p className="text-sm text-red-500">
-                {errors.imageCredit.message}
+                {errors.creditAuthor.message}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="creditAuthorLink">Author Profile Link</Label>
+            <Input
+              id="creditAuthorLink"
+              {...register("creditAuthorLink")}
+              placeholder="https://unsplash.com/@johndoe"
+            />
+            {errors.creditAuthorLink && (
+              <p className="text-sm text-red-500">
+                {errors.creditAuthorLink.message}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="creditPlatformLink">Platform Link</Label>
+            <Input
+              id="creditPlatformLink"
+              {...register("creditPlatformLink")}
+              placeholder="https://unsplash.com"
+            />
+            {errors.creditPlatformLink && (
+              <p className="text-sm text-red-500">
+                {errors.creditPlatformLink.message}
               </p>
             )}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
-            <Input
+            <Textarea
               id="description"
               {...register("description")}
               placeholder="Perfect gifts for..."
@@ -291,121 +229,6 @@ export default function AddGiftProfileDialog({ isOpen, onClose, onSuccess }) {
                   </button>
                 </span>
               ))}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Products</Label>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Input
-                  placeholder="Product Title"
-                  value={currentProduct.title}
-                  onChange={(e) =>
-                    setCurrentProduct({
-                      ...currentProduct,
-                      title: e.target.value,
-                    })
-                  }
-                />
-                <Input
-                  placeholder="Amazon Affiliate Link (https://amzn.to/...)"
-                  value={currentProduct.link}
-                  onChange={(e) =>
-                    setCurrentProduct({
-                      ...currentProduct,
-                      link: e.target.value,
-                    })
-                  }
-                />
-                <Input
-                  placeholder="Product Description"
-                  value={currentProduct.description}
-                  onChange={(e) =>
-                    setCurrentProduct({
-                      ...currentProduct,
-                      description: e.target.value,
-                    })
-                  }
-                />
-                <div className="space-y-2">
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Add a keyword"
-                      value={currentKeyword}
-                      onChange={(e) => setCurrentKeyword(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          e.preventDefault();
-                          handleAddKeyword();
-                        }
-                      }}
-                    />
-                    <Button type="button" onClick={handleAddKeyword}>
-                      Add
-                    </Button>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {currentProduct.keywords.map((keyword, index) => (
-                      <span
-                        key={index}
-                        className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-secondary/20"
-                      >
-                        {keyword}
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveKeyword(keyword)}
-                          className="ml-2 hover:text-primary/70"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <Button
-                  type="button"
-                  onClick={handleAddProduct}
-                  className="w-full"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Product
-                </Button>
-              </div>
-
-              <div className="space-y-2">
-                {products.map((product, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 bg-secondary/20 rounded-lg"
-                  >
-                    <div>
-                      <h4 className="font-medium">{product.title}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {product.description}
-                      </p>
-                      <div className="flex flex-wrap gap-1 mt-1">
-                        {product.keywords.map((keyword, i) => (
-                          <span
-                            key={i}
-                            className="px-2 py-0.5 text-xs bg-secondary rounded-full"
-                          >
-                            {keyword}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleRemoveProduct(index)}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
             </div>
           </div>
 

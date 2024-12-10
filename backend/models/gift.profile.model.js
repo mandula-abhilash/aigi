@@ -6,6 +6,8 @@ import { Schema, model } from "mongoose";
  * @property {String} title - Title of the product (required).
  * @property {String} link - URL to the product (required, valid URL).
  * @property {String} description - Description of the product (required).
+ * @property {String} whyItsGreat - Explanation of why this is a great gift (required).
+ * @property {Array<String>} keywords - Keywords for the product (required).
  */
 const productSchema = new Schema(
   {
@@ -30,6 +32,12 @@ const productSchema = new Schema(
       minlength: [10, "Description must be at least 10 characters long"],
       trim: true,
     },
+    whyItsGreat: {
+      type: String,
+      required: [true, "Please explain why this is a great gift"],
+      minlength: [10, "Explanation must be at least 10 characters long"],
+      trim: true,
+    },
     keywords: {
       type: [String],
       required: [true, "At least one keyword is required"],
@@ -39,7 +47,7 @@ const productSchema = new Schema(
       },
     },
   },
-  { _id: false } // Sub-document schema, no separate _id
+  { _id: false }
 );
 
 /**
@@ -48,6 +56,9 @@ const productSchema = new Schema(
  * @property {String} title - Title of the gift profile (required).
  * @property {String} description - Description of the gift profile (required).
  * @property {String} image - URL to the profile image (required, valid URL).
+ * @property {String} creditAuthor - Name of the image author (required).
+ * @property {String} creditAuthorLink - Link to the author's profile (required).
+ * @property {String} creditPlatformLink - Link to the platform (required).
  * @property {Array<String>} interests - Array of interests associated with the profile.
  * @property {Array<Object>} products - Array of products associated with the profile.
  */
@@ -74,10 +85,30 @@ const giftProfileSchema = new Schema(
         message: "Please provide a valid URL for the image",
       },
     },
-    imageCredit: {
+    creditAuthor: {
       type: String,
-      required: [true, "Image credit is required"],
+      required: [true, "Image credit author is required"],
       trim: true,
+    },
+    creditAuthorLink: {
+      type: String,
+      required: [true, "Author profile link is required"],
+      validate: {
+        validator: (v) => {
+          return /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i.test(v);
+        },
+        message: "Please provide a valid URL for the author profile",
+      },
+    },
+    creditPlatformLink: {
+      type: String,
+      required: [true, "Platform link is required"],
+      validate: {
+        validator: (v) => {
+          return /^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$/i.test(v);
+        },
+        message: "Please provide a valid URL for the platform",
+      },
     },
     interests: {
       type: [String],
@@ -110,7 +141,4 @@ const giftProfileSchema = new Schema(
   }
 );
 
-/**
- * Mongoose model for the GiftProfile schema.
- */
 export const GiftProfileModel = model("GiftProfile", giftProfileSchema);

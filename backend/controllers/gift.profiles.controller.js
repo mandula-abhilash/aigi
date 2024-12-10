@@ -5,16 +5,25 @@ import { GiftProfileModel } from "../models/gift.profile.model.js";
  */
 export const createGiftProfile = async (req, res) => {
   try {
-    const { title, description, image, imageCredit, interests, products } =
-      req.body;
+    const {
+      title,
+      description,
+      image,
+      creditAuthor,
+      creditAuthorLink,
+      creditPlatformLink,
+      interests,
+    } = req.body;
 
     const giftProfile = new GiftProfileModel({
       title,
       description,
       image,
-      imageCredit,
+      creditAuthor,
+      creditAuthorLink,
+      creditPlatformLink,
       interests,
-      products,
+      products: [], // Initialize with empty products array
     });
 
     await giftProfile.save();
@@ -24,6 +33,32 @@ export const createGiftProfile = async (req, res) => {
   } catch (error) {
     console.error("Error creating gift profile:", error.message);
     res.status(500).json({ error: "Failed to create gift profile" });
+  }
+};
+
+/**
+ * Add a product to a gift profile
+ */
+export const addProductToProfile = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const productData = req.body;
+
+    const giftProfile = await GiftProfileModel.findById(id);
+    if (!giftProfile) {
+      return res.status(404).json({ error: "Gift profile not found" });
+    }
+
+    giftProfile.products.push(productData);
+    await giftProfile.save();
+
+    res.status(200).json({
+      message: "Product added successfully",
+      giftProfile,
+    });
+  } catch (error) {
+    console.error("Error adding product:", error.message);
+    res.status(500).json({ error: "Failed to add product" });
   }
 };
 
@@ -65,12 +100,27 @@ export const getGiftProfileById = async (req, res) => {
 export const updateGiftProfile = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, image, imageCredit, interests, products } =
-      req.body;
+    const {
+      title,
+      description,
+      image,
+      creditAuthor,
+      creditAuthorLink,
+      creditPlatformLink,
+      interests,
+    } = req.body;
 
     const giftProfile = await GiftProfileModel.findByIdAndUpdate(
       id,
-      { title, description, image, imageCredit, interests, products },
+      {
+        title,
+        description,
+        image,
+        creditAuthor,
+        creditAuthorLink,
+        creditPlatformLink,
+        interests,
+      },
       { new: true }
     );
 

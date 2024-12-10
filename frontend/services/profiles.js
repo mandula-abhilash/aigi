@@ -1,5 +1,9 @@
 import api from "./api";
 
+/**
+ * Fetch all gift profiles
+ * @returns {Promise<Array>} Array of gift profiles
+ */
 export async function getGiftProfiles() {
   try {
     const response = await api.get("/api/gift-profiles");
@@ -12,6 +16,11 @@ export async function getGiftProfiles() {
   }
 }
 
+/**
+ * Fetch a single gift profile by ID
+ * @param {string} id - Gift profile ID
+ * @returns {Promise<Object>} Gift profile data
+ */
 export async function getGiftProfileById(id) {
   try {
     const response = await api.get(`/api/gift-profiles/${id}`);
@@ -24,6 +33,11 @@ export async function getGiftProfileById(id) {
   }
 }
 
+/**
+ * Create a new gift profile
+ * @param {Object} profileData - Gift profile data
+ * @returns {Promise<Object>} Created gift profile
+ */
 export async function createGiftProfile(profileData) {
   try {
     const response = await api.post("/api/gift-profiles", profileData);
@@ -36,6 +50,31 @@ export async function createGiftProfile(profileData) {
   }
 }
 
+/**
+ * Add a product to an existing gift profile
+ * @param {string} profileId - Gift profile ID
+ * @param {Object} productData - Product data to add
+ * @returns {Promise<Object>} Updated gift profile
+ */
+export async function addProductToProfile(profileId, productData) {
+  try {
+    const response = await api.post(
+      `/api/gift-profiles/${profileId}/products`,
+      productData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error adding product:", error);
+    throw new Error(error.response?.data?.message || "Failed to add product");
+  }
+}
+
+/**
+ * Update an existing gift profile
+ * @param {string} id - Gift profile ID
+ * @param {Object} profileData - Updated gift profile data
+ * @returns {Promise<Object>} Updated gift profile
+ */
 export async function updateGiftProfile(id, profileData) {
   try {
     const response = await api.put(`/api/gift-profiles/${id}`, profileData);
@@ -48,6 +87,11 @@ export async function updateGiftProfile(id, profileData) {
   }
 }
 
+/**
+ * Delete a gift profile
+ * @param {string} id - Gift profile ID
+ * @returns {Promise<Object>} Deletion response
+ */
 export async function deleteGiftProfile(id) {
   try {
     const response = await api.delete(`/api/gift-profiles/${id}`);
