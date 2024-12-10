@@ -7,14 +7,14 @@ const ImageCredit = ({
 }) => {
   return (
     creditAuthor && (
-      <div className="absolute bottom-0 right-0 p-2 text-sm text-white/70 bg-black/30">
+      <div className="absolute bottom-0 right-0 p-2 text-sm text-white/70 bg-black/30 z-10">
         Photo by{" "}
         {creditAuthorLink ? (
           <a
             href={creditAuthorLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="underline"
+            className="underline relative z-20 hover:text-white transition-colors"
           >
             {creditAuthor}
           </a>
@@ -29,7 +29,7 @@ const ImageCredit = ({
               href={creditPlatformLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="underline"
+              className="underline relative z-20 hover:text-white transition-colors"
             >
               Unsplash
             </a>

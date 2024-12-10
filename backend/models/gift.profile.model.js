@@ -119,10 +119,7 @@ const giftProfileSchema = new Schema(
     },
     products: {
       type: [productSchema],
-      validate: {
-        validator: (v) => Array.isArray(v) && v.length > 0,
-        message: "At least one product is required",
-      },
+      default: [],
     },
   },
   {

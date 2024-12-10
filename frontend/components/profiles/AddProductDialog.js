@@ -21,7 +21,6 @@ const productSchema = z.object({
   link: z.string().url("Must be a valid URL"),
   description: z.string().min(10, "Description must be at least 10 characters"),
   whyItsGreat: z.string().min(10, "Please explain why this is a great gift"),
-  keywords: z.array(z.string()).min(1, "At least one keyword is required"),
 });
 
 export default function AddProductDialog({
@@ -72,7 +71,8 @@ export default function AddProductDialog({
         keywords,
       };
 
-      await addProductToProfile(profileId, productData);
+      const response = await addProductToProfile(profileId, productData);
+
       toast({
         title: "Success",
         description: "Product added successfully",
@@ -80,8 +80,10 @@ export default function AddProductDialog({
 
       reset();
       setKeywords([]);
-      onSuccess?.();
+      onSuccess?.(response.giftProfile);
+      onClose();
     } catch (error) {
+      console.error("Error adding product:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to add product",
