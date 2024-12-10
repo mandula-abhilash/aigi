@@ -11,6 +11,7 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import Image from "next/image";
+import ImageCredit from "./ImageCredit";
 
 export default function ProfilePageClient({ profile }) {
   if (!profile) {
@@ -47,11 +48,11 @@ export default function ProfilePageClient({ profile }) {
               height={800}
               className="w-full h-full object-cover"
             />
-            {profile.imageCredit && (
-              <div className="absolute bottom-0 right-0 p-2 text-sm text-white/70 bg-black/30">
-                {profile.imageCredit}
-              </div>
-            )}
+            <ImageCredit
+              creditAuthor={profile.creditAuthor}
+              creditAuthorLink={profile.creditAuthorLink}
+              creditPlatformLink={profile.creditPlatformLink}
+            />
           </div>
 
           {/* Interests Section */}

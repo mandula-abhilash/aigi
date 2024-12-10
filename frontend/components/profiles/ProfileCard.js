@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import Image from "next/image";
+import ImageCredit from "./ImageCredit";
 
 export default function ProfileCard({ profile }) {
   return (
@@ -25,11 +26,12 @@ export default function ProfileCard({ profile }) {
           unoptimized
           className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
         />
-        {profile.imageCredit && (
-          <div className="absolute bottom-0 right-0 z-20 p-1 text-xs text-white/70 bg-black/30">
-            {profile.imageCredit}
-          </div>
-        )}
+        <ImageCredit
+          creditAuthor={profile.creditAuthor}
+          creditAuthorLink={profile.creditAuthorLink}
+          creditPlatformLink={profile.creditPlatformLink}
+        />
+
         <div className="absolute top-4 left-4 right-4 z-20">
           <h3 className="text-lg font-semibold text-white line-clamp-2">
             {profile.title}
@@ -56,7 +58,7 @@ export default function ProfileCard({ profile }) {
         </p>
 
         <div className="flex items-center justify-between pt-2">
-          <Link href={`/profiles/${profile.id}`}>
+          <Link href={`/gift-profiles/${profile.id}`}>
             <Button variant="outline" size="sm" className="gap-2">
               <Gift className="w-4 h-4" />
               View Gifts

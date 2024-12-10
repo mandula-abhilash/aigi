@@ -71,13 +71,13 @@ export default function HeroSection() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <Link href="/form">
+            <Link href="/find-me-a-gift">
               <Button size="lg" className="w-full sm:w-auto group">
                 <Sparkles className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
                 Start Gift Finding
               </Button>
             </Link>
-            <Link href="/profiles">
+            <Link href="/gift-profiles">
               <Button
                 size="lg"
                 variant="outline"
