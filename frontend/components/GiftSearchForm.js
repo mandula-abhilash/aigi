@@ -9,17 +9,16 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Search, X, Loader2, DollarSign, Plus } from "lucide-react";
+import { Search, X, Loader2, Plus } from "lucide-react";
 import { getFieldSuggestions, getGiftSuggestions } from "@/services/api";
 import GiftGrid from "@/components/suggestions/GiftGrid";
 import AIFormField from "@/components/form/AIFormField";
-import { Input } from "@/components/ui/input";
+import { motion } from "framer-motion";
 
 const searchSchema = z.object({
   recipient: z.string().min(1, "Please specify who the gift is for"),
   occasion: z.string().min(1, "Please specify the occasion"),
   interest: z.string(),
-  maxBudget: z.number().min(1, "Please specify a maximum budget"),
 });
 
 export default function GiftSearchForm() {
@@ -54,7 +53,6 @@ export default function GiftSearchForm() {
       recipient: "",
       occasion: "",
       interest: "",
-      maxBudget: 100,
     },
   });
 
@@ -73,7 +71,6 @@ export default function GiftSearchForm() {
           recipient: formValues.recipient,
           occasion: formValues.occasion,
           interest: formValues.interest,
-          maxBudget: formValues.maxBudget,
         };
 
         const fieldSuggestions = await getFieldSuggestions(field, context);
@@ -161,12 +158,15 @@ export default function GiftSearchForm() {
   };
 
   return (
-    <div className="mx-auto px-4">
-      <form
+    <div className="w-full mx-auto px-4">
+      <motion.form
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
         onSubmit={handleSubmit(onSubmit)}
-        className="max-w-4xl bg-gray-100 shadow-lg p-4 md:p-8 lg:p-12 mx-auto space-y-8 rounded-md"
+        className="bg-white max-w-4xl mx-auto dark:bg-gray-800 rounded-xl shadow-xl p-6 md:p-8 space-y-8"
       >
-        <div className="grid gap-6 max-w-4xl">
+        <div className="grid gap-6">
           <AIFormField
             id="recipient"
             label="Who is this gift for?"
@@ -177,6 +177,7 @@ export default function GiftSearchForm() {
             loading={loadingStates.recipient}
             error={errors.recipient?.message}
             placeholder="e.g., Mom, Friend, Colleague"
+            className="w-full"
           />
 
           <AIFormField
@@ -189,6 +190,7 @@ export default function GiftSearchForm() {
             loading={loadingStates.occasion}
             error={errors.occasion?.message}
             placeholder="e.g., Birthday, Anniversary"
+            className="w-full"
           />
 
           <div className="space-y-2">
@@ -208,63 +210,54 @@ export default function GiftSearchForm() {
               error={errors.interest?.message}
               placeholder="e.g., Reading, Cooking, Gaming"
               onKeyDown={handleInterestKeyDown}
+              className="w-full"
             />
 
             {interests.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-wrap gap-2 mt-4"
+              >
                 {interests.map((interest, index) => (
-                  <span
+                  <motion.span
                     key={index}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
                     className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-primary/10 text-primary"
                   >
                     {interest}
                     <button
                       type="button"
                       onClick={() => removeInterest(interest)}
-                      className="ml-2 hover:text-primary/70"
+                      className="ml-2 hover:text-primary/70 transition-colors"
                     >
                       <X className="h-3 w-3" />
                     </button>
-                  </span>
+                  </motion.span>
                 ))}
-              </div>
+              </motion.div>
             )}
-          </div>
-
-          <div className="space-y-2">
-            {/* <label htmlFor="maxBudget" className="text-sm font-medium">
-              Maximum Budget ({currencySymbol})
-            </label> */}
-            <div className="relative">
-              {/* <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" /> */}
-              {/* <Input
-                id="maxBudget"
-                type="number"
-                min="1"
-                placeholder="Enter maximum budget"
-                {...register("maxBudget", { valueAsNumber: true })}
-                className={`pl-4 ${errors.maxBudget ? "border-red-500" : ""}`}
-              />
-              {errors.maxBudget && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.maxBudget.message}
-                </p>
-              )} */}
-            </div>
           </div>
         </div>
 
-        <div className="flex gap-4">
-          <Button type="submit" className="flex-1" disabled={loading}>
+        <div className="flex flex-col sm:flex-row gap-4 pt-4">
+          <Button
+            type="submit"
+            className="flex-1 h-12"
+            disabled={loading}
+            size="lg"
+          >
             {loading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Searching...
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                Finding Perfect Gifts...
               </>
             ) : (
               <>
-                <Search className="mr-2 h-4 w-4" />
-                Find Gifts
+                <Search className="mr-2 h-5 w-5" />
+                Find Perfect Gifts
               </>
             )}
           </Button>
@@ -273,18 +266,20 @@ export default function GiftSearchForm() {
             variant="outline"
             onClick={handleClear}
             disabled={loading}
+            className="h-12"
+            size="lg"
           >
-            <X className="mr-2 h-4 w-4" />
+            <X className="mr-2 h-5 w-5" />
             Clear
           </Button>
         </div>
 
-        {/* {!user && (
-          <p className="text-sm text-muted-foreground text-center">
+        {!user && (
+          <p className="text-sm text-muted-foreground text-center mt-4">
             Sign in to save your searches and get personalized recommendations
           </p>
-        )} */}
-      </form>
+        )}
+      </motion.form>
 
       <GiftGrid results={results} />
     </div>
