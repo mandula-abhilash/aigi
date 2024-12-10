@@ -158,15 +158,15 @@ export default function GiftSearchForm() {
   };
 
   return (
-    <div className="w-full mx-auto px-4">
+    <div className="w-full mx-auto px-4 sm:px-6">
       <motion.form
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         onSubmit={handleSubmit(onSubmit)}
-        className="bg-white max-w-4xl mx-auto dark:bg-gray-800 rounded-xl shadow-xl p-6 md:p-8 space-y-8"
+        className="bg-white max-w-4xl mx-auto dark:bg-gray-800 rounded-xl shadow-xl p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8"
       >
-        <div className="grid gap-6">
+        <div className="grid gap-4 sm:gap-6">
           <AIFormField
             id="recipient"
             label="Who is this gift for?"
@@ -225,7 +225,7 @@ export default function GiftSearchForm() {
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-primary/10 text-primary"
+                    className="inline-flex items-center px-3 py-1.5 rounded-full text-sm bg-primary/10 text-primary"
                   >
                     {interest}
                     <button
@@ -242,22 +242,23 @@ export default function GiftSearchForm() {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 pt-4">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
           <Button
             type="submit"
-            className="flex-1 h-12"
+            className="w-full min-h-[1.5rem] text-base sm:flex-1"
             disabled={loading}
-            size="lg"
           >
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Finding Perfect Gifts...
+                <span className="whitespace-nowrap">
+                  Finding Perfect Gifts...
+                </span>
               </>
             ) : (
               <>
                 <Search className="mr-2 h-5 w-5" />
-                Find Perfect Gifts
+                <span className="whitespace-nowrap">Find Perfect Gifts</span>
               </>
             )}
           </Button>
@@ -266,8 +267,7 @@ export default function GiftSearchForm() {
             variant="outline"
             onClick={handleClear}
             disabled={loading}
-            className="h-12"
-            size="lg"
+            className="w-full min-h-[1.5rem] text-base"
           >
             <X className="mr-2 h-5 w-5" />
             Clear
