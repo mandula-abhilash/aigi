@@ -1,3 +1,11 @@
-# gifts-v2
+# Deploy
 
-[Edit in StackBlitz next generation editor ⚡️](https://stackblitz.com/~/github.com/mandula-abhilash/gifts-v2)
+```
+git pull origin master
+
+npm install
+
+npm run build
+
+PORT=6010 pm2 start npm --name "aigi-frontend-6010" -- start
+```

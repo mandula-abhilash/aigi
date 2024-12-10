@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { ExternalLink, Gift, Tag, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,13 +10,7 @@ import ImageCredit from "./ImageCredit";
 
 export default function ProfileCard({ profile }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -5 }}
-      transition={{ duration: 0.3 }}
-      className="group relative bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700"
-    >
+    <div className="group relative bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
       {/* Image Section */}
       <div className="relative h-48 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-transparent z-10" />
@@ -58,21 +54,14 @@ export default function ProfileCard({ profile }) {
         </p>
 
         <div className="flex items-center justify-end pt-2">
-          <Link href={`/gift-profiles/${profile.id}`}>
+          <Link href={`/gift-profiles/${profile._id}`}>
             <Button variant="outline" size="sm" className="text-xs gap-2">
               <Gift className="w-4 h-4" />
               View Gift Ideas
             </Button>
           </Link>
-          {/* <Button
-            variant="ghost"
-            size="icon"
-            className="text-gray-500 hover:text-primary"
-          >
-            <Heart className="w-4 h-4" />
-          </Button> */}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }

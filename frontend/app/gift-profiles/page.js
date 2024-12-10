@@ -1,11 +1,8 @@
-"use client";
-
 import { Suspense } from "react";
 import { getGiftProfiles } from "@/services/profiles";
 import ProfileGrid from "@/components/profiles/ProfileGrid";
 import SearchFilters from "@/components/profiles/SearchFilters";
 import AddGiftProfileButton from "@/components/profiles/AddGiftProfileButton";
-import { useState, useEffect } from "react";
 
 function LoadingSpinner() {
   return (
@@ -15,28 +12,8 @@ function LoadingSpinner() {
   );
 }
 
-export default function ProfilesPage() {
-  const [profiles, setProfiles] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchProfiles() {
-      try {
-        const data = await getGiftProfiles();
-        setProfiles(data);
-      } catch (error) {
-        console.error("Error fetching profiles:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchProfiles();
-  }, []);
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
+export default async function ProfilesPage() {
+  const profiles = await getGiftProfiles();
 
   return (
     <div className="mx-auto px-4 py-8">
@@ -54,7 +31,7 @@ export default function ProfilesPage() {
         </div>
 
         <Suspense fallback={<LoadingSpinner />}>
-          <ProfileGrid initialProfiles={profiles} />
+          <ProfileGrid profiles={profiles} />
         </Suspense>
       </div>
     </div>
