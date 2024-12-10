@@ -269,6 +269,8 @@ export const giftSuggestions = async (req, res) => {
     const suggestions =
       parsedContent.properties?.suggestions || parsedContent.suggestions;
 
+    // console.log(suggestions);
+
     if (!suggestions || !Array.isArray(suggestions)) {
       throw new Error("Invalid response format from OpenAI");
     }

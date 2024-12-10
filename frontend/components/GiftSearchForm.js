@@ -276,11 +276,11 @@ export default function GiftSearchForm() {
           </Button>
         </div>
 
-        {!user && (
+        {/* {!user && (
           <p className="text-sm text-muted-foreground text-center">
             Sign in to save your searches and get personalized recommendations
           </p>
-        )}
+        )} */}
       </form>
 
       <GiftGrid results={results} />

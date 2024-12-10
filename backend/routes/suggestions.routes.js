@@ -18,6 +18,7 @@ const createSuggestionsRouter = (middleware) => {
    * @method POST
    * @route /api/suggestions/fields
    */
+  // router.post("/fields", middleware.protect, fieldSuggestions);
   router.post("/fields", middleware.protect, fieldSuggestions);
 
   /**
@@ -26,6 +27,7 @@ const createSuggestionsRouter = (middleware) => {
    * @method POST
    * @route /api/suggestions/gifts
    */
+  // router.post("/gifts", middleware.protect, giftSuggestions);
   router.post("/gifts", middleware.protect, giftSuggestions);
 
   return router;
