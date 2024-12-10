@@ -245,7 +245,7 @@ export default function GiftSearchForm() {
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4">
           <Button
             type="submit"
-            className="w-full min-h-[1.5rem] text-base sm:flex-1"
+            className="w-full min-h-[1.5rem] text-base sm:flex-[3]"
             disabled={loading}
           >
             {loading ? (
@@ -267,7 +267,7 @@ export default function GiftSearchForm() {
             variant="outline"
             onClick={handleClear}
             disabled={loading}
-            className="w-full min-h-[1.5rem] text-base"
+            className="w-full min-h-[1.5rem] text-base sm:flex-1"
           >
             <X className="mr-2 h-5 w-5" />
             Clear
