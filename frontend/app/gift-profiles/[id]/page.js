@@ -1,36 +1,54 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { getGiftProfileById } from "@/services/profiles";
 import ProfilePageClient from "@/components/profiles/ProfilePageClient";
-import { getGiftProfiles, getGiftProfileById } from "@/services/profiles";
-import { notFound } from "next/navigation";
 
-// Disable static generation completely
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
-export async function generateStaticParams() {
-  try {
-    const profiles = await getGiftProfiles();
-    return profiles.map((profile) => ({
-      id: profile._id.toString(),
-    }));
-  } catch (error) {
-    console.error("generateStaticParams: Error fetching profiles:", error);
-    return [];
-  }
+function LoadingSpinner() {
+  return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+    </div>
+  );
 }
 
-export const dynamicParams = true;
+export default function ProfilePage() {
+  const params = useParams();
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-export default async function ProfilePage({ params }) {
-  try {
-    const profile = await getGiftProfileById(params.id);
-
-    if (!profile) {
-      notFound();
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const data = await getGiftProfileById(params.id);
+        setProfile(data);
+      } catch (error) {
+        console.error("Error loading profile:", error);
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
     }
 
-    return <ProfilePageClient profile={profile} />;
-  } catch (error) {
-    console.error("Error loading profile:", error);
-    notFound();
+    if (params.id) {
+      fetchProfile();
+    }
+  }, [params.id]);
+
+  if (loading) {
+    return <LoadingSpinner />;
   }
+
+  if (error || !profile) {
+    return (
+      <div className="mx-auto px-4 py-8 text-center">
+        <h1 className="text-2xl font-bold mb-4">Profile Not Found</h1>
+        <p>The requested gift profile could not be found.</p>
+      </div>
+    );
+  }
+
+  return <ProfilePageClient profile={profile} />;
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -10,18 +12,18 @@ export default function SearchFilters({ onSearch, onFilter }) {
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
-    onSearch(value);
+    onSearch?.(value);
   };
 
   const clearSearch = () => {
     setSearchTerm("");
-    onSearch("");
+    onSearch?.("");
   };
 
   const handleFilter = (filterType) => {
     const newFilter = activeFilter === filterType ? "" : filterType;
     setActiveFilter(newFilter);
-    onFilter(newFilter);
+    onFilter?.(newFilter);
   };
 
   return (
