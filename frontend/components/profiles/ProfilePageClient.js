@@ -15,12 +15,18 @@ import ImageCredit from "./ImageCredit";
 export default function ProfilePageClient({ profile: initialProfile }) {
   const [profile, setProfile] = useState(initialProfile);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
   const isAdmin = user?.role === "admin";
 
+  const handleProductAdded = useCallback((updatedProfile) => {
+    setProfile(updatedProfile);
+  }, []);
+
   const refreshProfile = useCallback(async () => {
     try {
+      setIsLoading(true);
       const updatedProfile = await getGiftProfileById(profile._id);
       setProfile(updatedProfile);
     } catch (error) {
@@ -29,6 +35,8 @@ export default function ProfilePageClient({ profile: initialProfile }) {
         description: "Failed to refresh profile data",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   }, [profile._id, toast]);
 
@@ -93,7 +101,10 @@ export default function ProfilePageClient({ profile: initialProfile }) {
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">Suggested Gifts</h2>
               {isAdmin && (
-                <Button onClick={() => setIsAddProductOpen(true)}>
+                <Button
+                  onClick={() => setIsAddProductOpen(true)}
+                  disabled={isLoading}
+                >
                   <Plus className="w-4 h-4 mr-2" />
                   Add Product
                 </Button>
@@ -101,12 +112,12 @@ export default function ProfilePageClient({ profile: initialProfile }) {
             </div>
 
             <div className="flex flex-col gap-6">
-              {profile.products.map((product, index) => (
+              {profile.products?.map((product, index) => (
                 <ProductCard key={index} product={product} index={index} />
               ))}
             </div>
 
-            {profile.products.length === 0 && (
+            {(!profile.products || profile.products.length === 0) && (
               <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-xl">
                 <Gift className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-500 dark:text-gray-400">
@@ -122,10 +133,7 @@ export default function ProfilePageClient({ profile: initialProfile }) {
         isOpen={isAddProductOpen}
         onClose={() => setIsAddProductOpen(false)}
         profileId={profile._id}
-        onSuccess={() => {
-          setIsAddProductOpen(false);
-          refreshProfile();
-        }}
+        onSuccess={handleProductAdded}
       />
     </div>
   );

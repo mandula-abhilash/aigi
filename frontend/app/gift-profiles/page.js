@@ -8,6 +8,9 @@ import AddGiftProfileButton from "@/components/profiles/AddGiftProfileButton";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 
+// Add revalidation time
+export const revalidate = 0; // Disable static generation
+
 export default function ProfilesPage() {
   const [profiles, setProfiles] = useState([]);
   const [filteredProfiles, setFilteredProfiles] = useState([]);
@@ -93,6 +96,7 @@ export default function ProfilesPage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
         className="max-w-6xl mx-auto mb-32"
       >
         <div className="text-center mb-12">

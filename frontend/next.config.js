@@ -30,6 +30,7 @@ const nextConfig = {
     ],
     domains: ["images.pexels.com"],
   },
+  // Enable dynamic content handling
   cleanDistDir: true,
   assetPrefix: "",
 };

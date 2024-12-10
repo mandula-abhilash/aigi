@@ -1,5 +1,10 @@
 import ProfilePageClient from "@/components/profiles/ProfilePageClient";
 import { getGiftProfiles, getGiftProfileById } from "@/services/profiles";
+import { notFound } from "next/navigation";
+
+// Disable static generation completely
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export async function generateStaticParams() {
   try {
@@ -13,32 +18,19 @@ export async function generateStaticParams() {
   }
 }
 
-// Add dynamic params configuration
 export const dynamicParams = true;
 
 export default async function ProfilePage({ params }) {
   try {
     const profile = await getGiftProfileById(params.id);
 
-    // Handle case where profile is not found
     if (!profile) {
-      return (
-        <div className="mx-auto px-4 py-8 text-center">
-          <h1 className="text-2xl font-bold mb-4">Profile Not Found</h1>
-          <p>The requested gift profile could not be found.</p>
-        </div>
-      );
+      notFound();
     }
 
     return <ProfilePageClient profile={profile} />;
   } catch (error) {
-    return (
-      <div className="mx-auto px-4 py-8 text-center">
-        <h1 className="text-2xl font-bold mb-4">Error</h1>
-        <p className="text-red-500">
-          {error.message || "Failed to load gift profile"}
-        </p>
-      </div>
-    );
+    console.error("Error loading profile:", error);
+    notFound();
   }
 }
