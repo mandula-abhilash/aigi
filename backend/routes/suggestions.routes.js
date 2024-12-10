@@ -19,7 +19,7 @@ const createSuggestionsRouter = (middleware) => {
    * @route /api/suggestions/fields
    */
   // router.post("/fields", middleware.protect, fieldSuggestions);
-  router.post("/fields", middleware.protect, fieldSuggestions);
+  router.post("/fields", fieldSuggestions);
 
   /**
    * Route for gift suggestions based on user input.
@@ -28,7 +28,7 @@ const createSuggestionsRouter = (middleware) => {
    * @route /api/suggestions/gifts
    */
   // router.post("/gifts", middleware.protect, giftSuggestions);
-  router.post("/gifts", middleware.protect, giftSuggestions);
+  router.post("/gifts", giftSuggestions);
 
   return router;
 };
