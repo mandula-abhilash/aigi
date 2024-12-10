@@ -30,7 +30,8 @@ const nextConfig = {
     ],
     domains: ["images.pexels.com"],
   },
-  trailingSlash: true,
+  cleanDistDir: true,
+  assetPrefix: "",
 };
 
 module.exports = nextConfig;
