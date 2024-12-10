@@ -2,33 +2,25 @@
 
 import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
-import { ExternalLink, Gift, Tag, Plus } from "lucide-react";
+import { Plus, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { getGiftProfileById } from "@/services/profiles";
 import AddProductDialog from "./AddProductDialog";
+import ProductCard from "./ProductCard";
 import Image from "next/image";
 import ImageCredit from "./ImageCredit";
 
 export default function ProfilePageClient({ profile: initialProfile }) {
-  const { user } = useAuth();
-  const { toast } = useToast();
   const [profile, setProfile] = useState(initialProfile);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const { user } = useAuth();
+  const { toast } = useToast();
   const isAdmin = user?.role === "admin";
 
   const refreshProfile = useCallback(async () => {
     try {
-      setRefreshing(true);
       const updatedProfile = await getGiftProfileById(profile._id);
       setProfile(updatedProfile);
     } catch (error) {
@@ -37,8 +29,6 @@ export default function ProfilePageClient({ profile: initialProfile }) {
         description: "Failed to refresh profile data",
         variant: "destructive",
       });
-    } finally {
-      setRefreshing(false);
     }
   }, [profile._id, toast]);
 
@@ -53,7 +43,7 @@ export default function ProfilePageClient({ profile: initialProfile }) {
 
   return (
     <div className="mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto mb-32">
+      <div className="max-w-6xl mx-auto mb-32">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -99,7 +89,7 @@ export default function ProfilePageClient({ profile: initialProfile }) {
           </div>
 
           {/* Gift Suggestions */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">Suggested Gifts</h2>
               {isAdmin && (
@@ -110,57 +100,20 @@ export default function ProfilePageClient({ profile: initialProfile }) {
               )}
             </div>
 
-            <div className="grid gap-4">
+            <div className="flex flex-col gap-6">
               {profile.products.map((product, index) => (
-                <Card key={index}>
-                  <CardHeader>
-                    <div className="flex items-center gap-2">
-                      <Gift className="h-5 w-5 text-primary" />
-                      <CardTitle>{product.title}</CardTitle>
-                    </div>
-                    <CardDescription>{product.description}</CardDescription>
-                    <div className="mt-2 text-sm">
-                      <p className="font-medium text-primary">
-                        Why It's a Great Gift:
-                      </p>
-                      <p className="mt-1">{product.whyItsGreat}</p>
-                    </div>
-                    {product.keywords && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {product.keywords.map((keyword, i) => (
-                          <span
-                            key={i}
-                            className="px-2 py-0.5 text-xs bg-secondary rounded-full"
-                          >
-                            {keyword}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex justify-end">
-                      <a
-                        href={product.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <Button variant="outline" size="sm" className="gap-2">
-                          <ExternalLink className="h-4 w-4" />
-                          View on Amazon
-                        </Button>
-                      </a>
-                    </div>
-                  </CardContent>
-                </Card>
+                <ProductCard key={index} product={product} index={index} />
               ))}
-
-              {profile.products.length === 0 && (
-                <div className="text-center py-8 text-gray-500">
-                  No products added yet.
-                </div>
-              )}
             </div>
+
+            {profile.products.length === 0 && (
+              <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-xl">
+                <Gift className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500 dark:text-gray-400">
+                  No products added yet
+                </p>
+              </div>
+            )}
           </div>
         </motion.div>
       </div>
