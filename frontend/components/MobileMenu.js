@@ -3,7 +3,16 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { Button } from "@/components/ui/button";
-import { Coins, LogOut, LogIn, UserPlus, BookmarkIcon, X } from "lucide-react";
+import {
+  Coins,
+  LogOut,
+  LogIn,
+  UserPlus,
+  BookmarkIcon,
+  X,
+  Gift,
+  Search,
+} from "lucide-react";
 import Link from "next/link";
 
 export default function MobileMenu({
@@ -38,12 +47,32 @@ export default function MobileMenu({
       </div>
 
       <div className="flex flex-col p-6 pt-16 space-y-4">
+        <Link href="/find-me-a-gift" onClick={onClose}>
+          <Button
+            variant="default"
+            className="w-full flex items-center justify-center gap-2"
+          >
+            <Gift className="w-4 h-4" />
+            Find Perfect Gift
+          </Button>
+        </Link>
+
+        <Link href="/gift-profiles" onClick={onClose}>
+          <Button
+            variant="outline"
+            className="w-full flex items-center justify-center gap-2"
+          >
+            <Search className="w-4 h-4" />
+            Browse Gift Profiles
+          </Button>
+        </Link>
+
         <Button
           variant="ghost"
           onClick={onCurrencyClick}
           className="flex items-center justify-center space-x-2 text-gray-600 dark:text-gray-300"
         >
-          <span>{currencySymbol}</span>
+          <span className="text-amber-500">{currencySymbol}</span>
           <span>{currency}</span>
         </Button>
 

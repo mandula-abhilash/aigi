@@ -3,7 +3,17 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
-import { Menu, X, Coins, LogOut, UserPlus, LogIn, Loader2 } from "lucide-react";
+import {
+  Menu,
+  X,
+  Coins,
+  LogOut,
+  UserPlus,
+  LogIn,
+  Loader2,
+  Gift,
+  Search,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import TokenPurchaseModal from "@/components/TokenPurchaseModal";
 import MobileMenu from "@/components/MobileMenu";
@@ -44,6 +54,19 @@ export default function Header() {
           </Link>
 
           <nav className="hidden md:flex items-center space-x-4">
+            <Link href="/find-me-a-gift">
+              <Button variant="ghost" className="flex items-center gap-2">
+                <Gift className="w-4 h-4" />
+                Find Gift
+              </Button>
+            </Link>
+            <Link href="/gift-profiles">
+              <Button variant="ghost" className="flex items-center gap-2">
+                <Search className="w-4 h-4" />
+                Browse Profiles
+              </Button>
+            </Link>
+
             <Button
               variant="outline"
               onClick={() => setIsCurrencyModalOpen(true)}
