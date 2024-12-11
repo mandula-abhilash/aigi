@@ -17,7 +17,7 @@ function LoadingSpinner() {
 }
 
 export default async function ProfilesPage() {
-  const profiles = await getGiftProfiles();
+  const initialProfiles = await getGiftProfiles();
 
   return (
     <div className="mx-auto px-4 py-8">
@@ -35,7 +35,7 @@ export default async function ProfilesPage() {
         </div>
 
         <Suspense fallback={<LoadingSpinner />}>
-          <ProfileGrid profiles={profiles} />
+          <ProfileGrid initialProfiles={initialProfiles} />
         </Suspense>
       </div>
     </div>

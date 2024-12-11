@@ -66,7 +66,7 @@ export default function AddGiftProfileDialog({ isOpen, onClose, onSuccess }) {
       setLoading(true);
       const title = `For ${data.recipient} on ${data.occasion}`;
 
-      await createGiftProfile({
+      const newProfile = await createGiftProfile({
         title,
         description: data.description,
         image: data.imageUrl,
@@ -75,6 +75,12 @@ export default function AddGiftProfileDialog({ isOpen, onClose, onSuccess }) {
         creditPlatformLink: data.creditPlatformLink,
         interests,
       });
+
+      // Dispatch custom event with new profile data
+      const event = new CustomEvent("profileAdded", {
+        detail: newProfile.giftProfile,
+      });
+      window.dispatchEvent(event);
 
       toast({
         title: "Success",

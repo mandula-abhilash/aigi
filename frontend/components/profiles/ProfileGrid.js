@@ -2,18 +2,32 @@
 
 import { motion } from "framer-motion";
 import ProfileCard from "./ProfileCard";
+import { useEffect, useState } from "react";
 
 const container = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1,
+      staggerChildren: 0.15,
     },
   },
 };
 
-export default function ProfileGrid({ profiles = [] }) {
+export default function ProfileGrid({ initialProfiles = [] }) {
+  const [profiles, setProfiles] = useState(initialProfiles);
+
+  // Listen for profile updates via custom event
+  useEffect(() => {
+    const handleProfileAdded = (event) => {
+      const newProfile = event.detail;
+      setProfiles((currentProfiles) => [newProfile, ...currentProfiles]);
+    };
+
+    window.addEventListener("profileAdded", handleProfileAdded);
+    return () => window.removeEventListener("profileAdded", handleProfileAdded);
+  }, []);
+
   if (!profiles?.length) {
     return (
       <div className="text-center py-12">
