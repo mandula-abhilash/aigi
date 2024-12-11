@@ -27,7 +27,7 @@ export default function TermsPage() {
             </p>
             <ul className="list-disc pl-6 mb-4">
               <li>AI-powered gift suggestion form</li>
-              <li>Curated gift profiles</li>
+              <li>Curated gift ideas</li>
               <li>Affiliate product links</li>
             </ul>
           </section>

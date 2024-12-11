@@ -19,9 +19,9 @@ export default async function ProfilesPage() {
     <div className="mx-auto px-4 py-8">
       <div className="max-w-6xl mx-auto mb-32">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4">Gift Profiles</h1>
+          <h1 className="text-4xl font-bold mb-4">Gift Ideas</h1>
           <p className="text-lg text-gray-600 dark:text-gray-400">
-            Browse our curated collection of gift profiles for every occasion
+            Browse our curated collection of gift ideas for every occasion
           </p>
         </div>
 

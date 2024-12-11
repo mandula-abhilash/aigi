@@ -1,6 +1,34 @@
 import { getGiftProfileById } from "@/services/profiles";
 import ProfilePageClient from "@/components/profiles/ProfilePageClient";
 
+export async function generateMetadata({ params }) {
+  try {
+    const profile = await getGiftProfileById(params.id);
+
+    if (!profile) {
+      return {
+        title: "Profile Not Found - AIGI Gift Finder",
+        description: "The requested gift profile could not be found.",
+      };
+    }
+
+    return {
+      title: `${profile.title} - AIGI Gift Finder`,
+      description: profile.description,
+      openGraph: {
+        title: `${profile.title} - AIGI Gift Finder`,
+        description: profile.description,
+        images: [profile.image],
+      },
+    };
+  } catch (error) {
+    return {
+      title: "Error - AIGI Gift Finder",
+      description: "Failed to load the gift profile.",
+    };
+  }
+}
+
 export default async function ProfilePage({ params }) {
   try {
     const profile = await getGiftProfileById(params.id);

@@ -76,12 +76,20 @@ export const getGiftProfiles = async (req, res) => {
 };
 
 /**
- * Get a single gift profile by ID
+ * Get a single gift profile by ID or slug
  */
 export const getGiftProfileById = async (req, res) => {
   try {
     const { id } = req.params;
-    const giftProfile = await GiftProfileModel.findById(id);
+    let giftProfile;
+
+    // First try to find by slug
+    giftProfile = await GiftProfileModel.findOne({ slug: id });
+
+    // If not found by slug, try to find by ID
+    if (!giftProfile) {
+      giftProfile = await GiftProfileModel.findById(id);
+    }
 
     if (!giftProfile) {
       return res.status(404).json({ error: "Gift profile not found" });

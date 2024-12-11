@@ -24,7 +24,7 @@ export default function AboutPage() {
           </p>
           <ul className="list-disc pl-6 mb-6">
             <li className="mb-2">
-              <strong>Curated Gift Profiles:</strong> Browse our handpicked
+              <strong>Curated Gift Ideas:</strong> Browse our handpicked
               collection of gift suggestions for specific occasions and
               interests.
             </li>

@@ -64,7 +64,7 @@ export default function AddGiftProfileDialog({ isOpen, onClose, onSuccess }) {
 
     try {
       setLoading(true);
-      const title = `To ${data.recipient} on ${data.occasion}`;
+      const title = `For ${data.recipient} on ${data.occasion}`;
 
       await createGiftProfile({
         title,

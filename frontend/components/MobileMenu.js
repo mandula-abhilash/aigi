@@ -57,13 +57,13 @@ export default function MobileMenu({
           </Button>
         </Link>
 
-        <Link href="/gift-profiles" onClick={onClose}>
+        <Link href="/gift-ideas" onClick={onClose}>
           <Button
             variant="outline"
             className="w-full flex items-center justify-center gap-2"
           >
             <Search className="w-4 h-4" />
-            Browse Gift Profiles
+            Browse Gift Ideas
           </Button>
         </Link>
 

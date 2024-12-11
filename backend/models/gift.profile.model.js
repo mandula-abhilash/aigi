@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import { generateUniqueSlug } from "../lib/slugUtils.js";
 
 /**
  * Schema for the Product sub-document.
@@ -54,6 +55,7 @@ const productSchema = new Schema(
  * Schema for the GiftProfile collection.
  *
  * @property {String} title - Title of the gift profile (required).
+ * @property {String} slug - URL-friendly version of the title (unique).
  * @property {String} description - Description of the gift profile (required).
  * @property {String} image - URL to the profile image (required, valid URL).
  * @property {String} creditAuthor - Name of the image author (required).
@@ -68,6 +70,11 @@ const giftProfileSchema = new Schema(
       type: String,
       required: [true, "Profile title is required"],
       trim: true,
+    },
+    slug: {
+      type: String,
+      unique: true,
+      index: true,
     },
     description: {
       type: String,
@@ -137,5 +144,19 @@ const giftProfileSchema = new Schema(
     },
   }
 );
+
+// Pre-save middleware to generate slug
+giftProfileSchema.pre("save", async function (next) {
+  if (!this.isModified("title")) {
+    return next();
+  }
+
+  try {
+    this.slug = generateUniqueSlug(this.title);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
 export const GiftProfileModel = model("GiftProfile", giftProfileSchema);

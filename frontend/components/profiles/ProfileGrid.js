@@ -18,7 +18,7 @@ export default function ProfileGrid({ profiles = [] }) {
     return (
       <div className="text-center py-12">
         <p className="text-gray-500 dark:text-gray-400">
-          No gift profiles found matching your criteria
+          No gift ideas found matching your criteria
         </p>
       </div>
     );

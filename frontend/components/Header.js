@@ -60,10 +60,10 @@ export default function Header() {
                 Find Gift
               </Button>
             </Link>
-            <Link href="/gift-profiles">
+            <Link href="/gift-ideas">
               <Button variant="ghost" className="flex items-center gap-2">
                 <Search className="w-4 h-4" />
-                Browse Profiles
+                Browse Gift Ideas
               </Button>
             </Link>
 

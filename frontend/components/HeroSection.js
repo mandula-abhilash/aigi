@@ -114,14 +114,14 @@ export default function HeroSection() {
                 Start Gift Finding
               </Button>
             </Link>
-            <Link href="/gift-profiles">
+            <Link href="/gift-ideas">
               <Button
                 size="lg"
                 variant="outline"
                 className="w-full sm:w-auto group"
               >
                 <Search className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
-                Browse Gift Profiles
+                Browse Gift Ideas
               </Button>
             </Link>
           </motion.div>

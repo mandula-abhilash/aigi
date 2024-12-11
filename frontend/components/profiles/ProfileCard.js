@@ -54,7 +54,7 @@ export default function ProfileCard({ profile }) {
         </p>
 
         <div className="flex items-center justify-end pt-2">
-          <Link href={`/gift-profiles/${profile._id}`}>
+          <Link href={`/gift-ideas/${profile.slug}`}>
             <Button variant="outline" size="sm" className="text-xs gap-2">
               <Gift className="w-4 h-4" />
               View Gift Ideas

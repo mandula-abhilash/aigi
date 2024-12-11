@@ -5,7 +5,8 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "server": "nodemon server.js"
+    "server": "nodemon server.js",
+    "migrate:slugs": "node scripts/migrations/add-slugs.js"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +25,8 @@
     "express-async-handler": "^1.2.0",
     "helmet": "^8.0.0",
     "openai": "^4.73.0",
+    "shortid": "^2.2.16",
+    "slugify": "^1.6.6",
     "stripe": "^17.4.0",
     "visdak-sesam": "github:mandula-abhilash/visdak-sesam",
     "visdak-wallet": "github:mandula-abhilash/visdak-wallet"
