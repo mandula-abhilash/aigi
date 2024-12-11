@@ -4,6 +4,10 @@ import ProfileGrid from "@/components/profiles/ProfileGrid";
 import SearchFilters from "@/components/profiles/SearchFilters";
 import AddGiftProfileButton from "@/components/profiles/AddGiftProfileButton";
 
+// Disable static rendering and cache
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 function LoadingSpinner() {
   return (
     <div className="flex items-center justify-center min-h-[60vh]">
