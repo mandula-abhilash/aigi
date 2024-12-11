@@ -72,12 +72,12 @@ export default function ProductCard({ product, index }) {
         </div>
 
         {/* Amazon Button - Always at bottom */}
-        <div className="flex items-center justify-end pt-4 mt-4 border-t border-gray-100 dark:border-gray-700">
+        <div className="flex items-center justify-center sm:justify-end pt-4 mt-4 border-t border-gray-100 dark:border-gray-700">
           <motion.a
             href={product.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="relative inline-flex group"
+            className="relative inline-flex group w-full sm:w-auto"
             whileHover="hover"
             whileTap="tap"
             initial="rest"
@@ -95,9 +95,9 @@ export default function ProductCard({ product, index }) {
             {/* Gradient Glow */}
             <div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 opacity-70 blur-lg transition-all duration-300 group-hover:opacity-100" />
             {/* Button */}
-            <div className="relative inline-flex items-center gap-2 px-4 py-2 font-bold text-white bg-gradient-to-br from-yellow-500 to-orange-600 rounded-lg leading-none shadow-md hover:shadow-lg">
-              <span className="font-semibold text-sm">View on Amazon</span>
-              <ExternalLink className="w-4 h-4" />
+            <div className="relative w-full flex items-center justify-center gap-2 px-6 py-3 font-bold text-white bg-gradient-to-br from-yellow-500 to-orange-600 rounded-lg leading-none shadow-md hover:shadow-lg">
+              <span className="font-semibold text-sm">Buy on Amazon</span>
+              {/* <ExternalLink className="w-4 h-4" /> */}
             </div>
           </motion.a>
         </div>

@@ -8,7 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "AIGI Gift Finder",
+  title: "AIGI - Perfect Gift Every Time",
   description: "Find the perfect gift for your loved ones",
   icons: {
     icon: "/favicon.ico",

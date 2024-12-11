@@ -63,9 +63,15 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Copyright */}
-        <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
-          <p>© {currentYear} VISDAK. All rights reserved.</p>
+        {/* Copyright and Disclaimer */}
+        <div className="border-t mt-8 pt-8 text-center space-y-2">
+          <p className="text-sm text-muted-foreground">
+            © {currentYear} VISDAK. All rights reserved.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            As an Amazon Associate, we earn commissions from qualifying
+            purchases.
+          </p>
         </div>
       </div>
     </footer>

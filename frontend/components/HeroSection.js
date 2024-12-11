@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 
 export default function HeroSection() {
   return (
-    <section className="relative py-28 overflow-hidden">
+    <section className="relative py-14 overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-background" />
 
@@ -41,6 +41,43 @@ export default function HeroSection() {
 
       <div className="relative mx-auto px-4 max-w-6xl">
         <div className="text-center max-w-3xl mx-auto">
+          {/* Main Tagline */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="mb-8"
+          >
+            <div className="inline-flex flex-col items-center gap-4">
+              <div className="inline-flex text-sm font-medium shadow-lg rounded-full">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="px-4 py-0.5 bg-rose-500/10 text-rose-500 rounded-l-full border border-r-0 border-rose-500/20"
+                >
+                  Perfect
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="px-4 py-0.5 bg-primary/10 text-primary border border-primary/20"
+                >
+                  Thoughtful
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="px-4 py-0.5 bg-emerald-500/10 text-emerald-500 rounded-r-full border border-l-0 border-emerald-500/20"
+                >
+                  Memorable
+                </motion.div>
+              </div>
+            </div>
+          </motion.div>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
