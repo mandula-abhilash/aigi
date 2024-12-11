@@ -14,6 +14,7 @@ import { getFieldSuggestions, getGiftSuggestions } from "@/services/api";
 import GiftGrid from "@/components/suggestions/GiftGrid";
 import AIFormField from "@/components/form/AIFormField";
 import { motion } from "framer-motion";
+import { useAnalytics } from "@/hooks/use-analytics";
 
 const searchSchema = z.object({
   recipient: z.string().min(1, "Please specify who the gift is for"),
@@ -38,6 +39,8 @@ export default function GiftSearchForm() {
   const { currencySymbol } = useCurrency();
   const { toast } = useToast();
   const [results, setResults] = useState([]);
+
+  const { trackGiftFinder, trackForm } = useAnalytics();
 
   const {
     register,
@@ -95,6 +98,11 @@ export default function GiftSearchForm() {
   const handleInputChange = (field) => (e) => {
     const value = e.target.value;
     setValue(field, value);
+    trackGiftFinder("field-interaction", {
+      field,
+      value,
+      suggestions: suggestions[field],
+    });
     debouncedFetch(field, value);
   };
 
@@ -130,12 +138,26 @@ export default function GiftSearchForm() {
 
     try {
       setLoading(true);
+      trackGiftFinder("form-submit", {
+        ...data,
+        interests,
+      });
+
       const giftSuggestions = await getGiftSuggestions({
         ...data,
         interests,
       });
+
+      trackGiftFinder("suggestions-received", {
+        results: giftSuggestions,
+        criteria: { ...data, interests },
+      });
+
       setResults(giftSuggestions);
     } catch (error) {
+      // Track error
+      trackForm("gift-finder", "error", { error: error.message });
+
       toast({
         title: "Error",
         description: error.message || "Failed to fetch gift suggestions",

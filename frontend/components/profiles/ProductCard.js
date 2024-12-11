@@ -1,8 +1,21 @@
 import { motion } from "framer-motion";
 import { ExternalLink, Gift, Tag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useAnalytics } from "@/hooks/use-analytics";
 
 export default function ProductCard({ product, index }) {
+  const { trackAffiliate } = useAnalytics();
+
+  const handleAmazonClick = (e) => {
+    trackAffiliate("link-click", {
+      product,
+      context: {
+        position: index,
+        marketplace: "amazon",
+      },
+    });
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -79,6 +92,7 @@ export default function ProductCard({ product, index }) {
             rel="noopener noreferrer"
             className="relative inline-flex group w-full sm:w-auto"
             whileHover="hover"
+            onClick={handleAmazonClick}
             whileTap="tap"
             initial="rest"
             variants={{

@@ -15,6 +15,7 @@ import { createCheckoutSession } from "@/services/checkout";
 import { loadStripe } from "@stripe/stripe-js";
 import { getActivePlans } from "@/services/plans";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { useAnalytics } from "@/hooks/use-analytics";
 import { motion } from "framer-motion";
 
 const stripePromise = loadStripe(
@@ -61,6 +62,7 @@ export default function TokenPurchaseModal({ isOpen, onClose }) {
   const [loadingPlans, setLoadingPlans] = useState(true);
   const { toast } = useToast();
   const { currencySymbol } = useCurrency();
+  const { trackUser } = useAnalytics();
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -89,6 +91,14 @@ export default function TokenPurchaseModal({ isOpen, onClose }) {
   const handlePurchase = async (plan) => {
     try {
       setLoadingPlanId(plan._id);
+
+      trackUser("purchase-start", user?._id, {
+        planId: plan._id,
+        planName: plan.name,
+        price: plan.price,
+        tokens: plan.tokens,
+      });
+
       const { sessionId } = await createCheckoutSession({
         planId: plan._id,
         paymentGateway: "stripe",
@@ -105,10 +115,18 @@ export default function TokenPurchaseModal({ isOpen, onClose }) {
       });
 
       if (error) {
+        trackUser("purchase-error", user?._id, {
+          planId: plan._id,
+          error: error.message,
+        });
         throw error;
       }
     } catch (error) {
       console.error("Purchase error:", error);
+      trackUser("purchase-error", user?._id, {
+        planId: plan._id,
+        error: error.message,
+      });
       toast({
         title: "Error",
         description:

@@ -1,58 +1,109 @@
 import { useCallback } from "react";
 import {
-  userTracking,
-  searchTracking,
-  engagementTracking,
-  conversionTracking,
-  errorTracking,
-} from "@/lib/analytics";
+  trackEvent,
+  trackPageView,
+  trackError,
+  trackInteraction,
+  trackFormInteraction,
+} from "@/lib/analytics/core";
+import { userTracking } from "../lib/analytics/modules/user";
+import { affiliateTracking } from "@/lib/analytics/modules/affiliate";
+import { giftFinderTracking } from "@/lib/analytics/modules/giftFinder";
 
 export function useAnalytics() {
+  // Page view tracking
+  const trackPage = useCallback((path, title) => {
+    trackPageView(path, title);
+  }, []);
+
+  // Form tracking
+  const trackForm = useCallback((formId, action, data = {}) => {
+    trackFormInteraction(formId, action, data);
+  }, []);
+
+  // Gift finder tracking
+  const trackGiftFinder = useCallback((action, data = {}) => {
+    switch (action) {
+      case "field-interaction":
+        giftFinderTracking.trackFieldInteraction(
+          data.field,
+          data.value,
+          data.suggestions
+        );
+        break;
+      case "form-submit":
+        giftFinderTracking.trackFormSubmit(data);
+        break;
+      case "suggestions-received":
+        giftFinderTracking.trackSuggestionResults(data.results, data.criteria);
+        break;
+      default:
+        trackEvent("Gift Finder", action, data);
+    }
+  }, []);
+
   // User tracking
-  const trackAuth = useCallback((action, userId) => {
-    userTracking.trackAuth(action, userId);
+  const trackUser = useCallback((action, userId, data = {}) => {
+    switch (action) {
+      case "auth":
+        userTracking.trackAuth(data.type, userId, data);
+        break;
+      case "profile-update":
+        userTracking.trackProfileUpdate(userId, data);
+        break;
+      case "preferences":
+        userTracking.trackPreferences(userId, data);
+        break;
+      default:
+        userTracking.trackSession(userId, action, data);
+    }
   }, []);
 
-  // Gift finder form tracking
-  const trackFormSubmission = useCallback((formData) => {
-    searchTracking.trackSearchComplete(
-      "gift-finder",
-      {
-        recipient: formData.recipient,
-        occasion: formData.occasion,
-        interests: formData.interests,
-      },
-      formData.resultCount
-    );
-  }, []);
-
-  // Gift idea view tracking
-  const trackGiftIdeaView = useCallback((giftProfile) => {
-    engagementTracking.trackButtonClick("view-gift-idea", {
-      profileId: giftProfile._id,
-      title: giftProfile.title,
-    });
-  }, []);
-
-  // Affiliate click tracking
-  const trackAffiliateClick = useCallback((product, giftProfile) => {
-    conversionTracking.trackAffiliateClick(
-      product._id,
-      product.title,
-      product.price
-    );
+  // Affiliate tracking
+  const trackAffiliate = useCallback((action, data = {}) => {
+    switch (action) {
+      case "link-click":
+        affiliateTracking.trackLinkClick(
+          data.product,
+          data.profileId,
+          data.context
+        );
+        break;
+      case "conversion":
+        affiliateTracking.trackConversion(
+          data.orderId,
+          data.products,
+          data.total,
+          data.context
+        );
+        break;
+      case "impression":
+        affiliateTracking.trackImpression(
+          data.product,
+          data.profileId,
+          data.context
+        );
+        break;
+      default:
+        trackEvent("Affiliate", action, data);
+    }
   }, []);
 
   // Error tracking
-  const trackError = useCallback((type, details) => {
-    errorTracking.trackApiError(type, details.code, details.message);
+  const trackAppError = useCallback((category, error, context = {}) => {
+    trackError(category, error.message || error, {
+      ...context,
+      stack: error.stack,
+    });
   }, []);
 
   return {
-    trackAuth,
-    trackFormSubmission,
-    trackGiftIdeaView,
-    trackAffiliateClick,
-    trackError,
+    trackPage,
+    trackForm,
+    trackGiftFinder,
+    trackUser,
+    trackAffiliate,
+    trackAppError,
+    trackInteraction,
   };
 }

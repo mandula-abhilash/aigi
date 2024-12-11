@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { useAnalytics } from "@/hooks/use-analytics";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,6 +22,8 @@ export default function LoginForm({ onSuccess }) {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const { toast } = useToast();
+  const { trackUser } = useAnalytics();
+
   const {
     register,
     handleSubmit,
@@ -31,7 +35,13 @@ export default function LoginForm({ onSuccess }) {
   const onSubmit = async (data) => {
     try {
       setLoading(true);
-      await login(data);
+      const response = await login(data);
+
+      trackUser("auth", response.user?._id, {
+        type: "login",
+        email: data.email,
+      });
+
       toast({
         title: "Success",
         description: "Logged in successfully!",
@@ -39,6 +49,11 @@ export default function LoginForm({ onSuccess }) {
       });
       onSuccess?.();
     } catch (error) {
+      trackUser("auth", null, {
+        type: "login-error",
+        error: error.message,
+      });
+
       toast({
         title: "Error",
         description: error.message || "Failed to login",
