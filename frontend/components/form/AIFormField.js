@@ -8,6 +8,7 @@ import ScrollingPlaceholder from "./ScrollingPlaceholder";
 const placeholderSuggestions = {
   recipient: [
     "Wife",
+    "3 year old son",
     "Brother",
     "Cousin's dog",
     "Female school friend met after many years",
@@ -16,6 +17,7 @@ const placeholderSuggestions = {
   ],
   occasion: [
     "Anniversary",
+    "First Day at Preschool",
     "Birthday",
     "Adoption Day",
     "Reunion Celebration",
@@ -24,6 +26,7 @@ const placeholderSuggestions = {
   ],
   interest: [
     ["Cooking", "Gardening", "Yoga", "Baking"],
+    ["Playing with toys", "Coloring", "Building blocks", "Watching cartoons"],
     ["Gaming", "Reading", "Photography"],
     ["Playing fetch", "Chewing toys", "Running in the park"],
     ["Dancing", "Music", "Art", "Movies"],
