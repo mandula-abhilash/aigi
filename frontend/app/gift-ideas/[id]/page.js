@@ -7,23 +7,23 @@ export async function generateMetadata({ params }) {
 
     if (!profile) {
       return {
-        title: "Profile Not Found - AIGI Gift Finder",
+        title: "Profile Not Found",
         description: "The requested gift profile could not be found.",
       };
     }
 
     return {
-      title: `${profile.title} - AIGI Gift Finder`,
+      title: `${profile.title}`,
       description: profile.description,
       openGraph: {
-        title: `${profile.title} - AIGI Gift Finder`,
+        title: `${profile.title}`,
         description: profile.description,
         images: [profile.image],
       },
     };
   } catch (error) {
     return {
-      title: "Error - AIGI Gift Finder",
+      title: "Error",
       description: "Failed to load the gift profile.",
     };
   }
