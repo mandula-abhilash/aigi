@@ -49,12 +49,12 @@ export default function HeroSection() {
             className="mb-8"
           >
             <div className="inline-flex flex-col items-center gap-4">
-              <div className="inline-flex text-sm font-medium shadow-lg rounded-full">
+              <div className="inline-flex text-sm font-semibold shadow-lg rounded-full hover:scale-105 duration-500">
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="px-4 py-0.5 bg-rose-500/10 text-rose-500 rounded-l-full border border-r-0 border-rose-500/20"
+                  className="px-4 py-0.5 bg-rose-500/10 text-rose-500 rounded-l-full border border-r-0 border-rose-500/20 cursor-default"
                 >
                   Perfect
                 </motion.div>
@@ -62,7 +62,7 @@ export default function HeroSection() {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="px-4 py-0.5 bg-primary/10 text-primary border border-primary/20"
+                  className="px-4 py-0.5 bg-primary/10 text-primary border border-primary/20 cursor-default"
                 >
                   Thoughtful
                 </motion.div>
@@ -70,7 +70,7 @@ export default function HeroSection() {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.4 }}
-                  className="px-4 py-0.5 bg-emerald-500/10 text-emerald-500 rounded-r-full border border-l-0 border-emerald-500/20"
+                  className="px-4 py-0.5 bg-emerald-500/10 text-emerald-500 rounded-r-full border border-l-0 border-emerald-500/20 cursor-default"
                 >
                   Memorable
                 </motion.div>
