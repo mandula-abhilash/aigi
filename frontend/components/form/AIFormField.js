@@ -3,6 +3,34 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ScrollingPlaceholder from "./ScrollingPlaceholder";
+
+const placeholderSuggestions = {
+  recipient: [
+    "Wife",
+    "Brother",
+    "Cousin's dog",
+    "Female school friend met after many years",
+    "Mentor who shaped my career",
+    "College roommate",
+  ],
+  occasion: [
+    "Anniversary",
+    "Birthday",
+    "Adoption Day",
+    "Reunion Celebration",
+    "Career Milestone",
+    "College Farewell Party",
+  ],
+  interest: [
+    ["Cooking", "Gardening", "Yoga", "Baking"],
+    ["Gaming", "Reading", "Photography"],
+    ["Playing fetch", "Chewing toys", "Running in the park"],
+    ["Dancing", "Music", "Art", "Movies"],
+    ["Public speaking", "Leadership books", "Networking events"],
+    ["Gaming marathons", "Late-night talks", "Board games"],
+  ],
+};
 
 export default function AIFormField({
   id,
@@ -45,10 +73,21 @@ export default function AIFormField({
           onChange={onChange}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setTimeout(() => setIsFocused(false), 200)}
-          className={cn(error ? "border-red-500" : "")}
-          placeholder={placeholder}
+          className={cn(
+            error ? "border-red-500" : "",
+            "bg-transparent transition-colors",
+            !value && "text-transparent"
+          )}
           {...props}
         />
+
+        {!value && (
+          <div className="absolute inset-0 pointer-events-none pl-3 flex items-center">
+            <ScrollingPlaceholder
+              suggestions={placeholderSuggestions[id] || [placeholder]}
+            />
+          </div>
+        )}
 
         {showSuggestions && (
           <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
