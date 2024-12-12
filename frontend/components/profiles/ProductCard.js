@@ -21,29 +21,16 @@ export default function ProductCard({ product, index }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700"
+      className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 flex flex-col"
     >
       <div className="p-6">
-        {/* Header: Title and Buy Button */}
-        <div className="flex items-start justify-between gap-4 mb-4">
-          <div>
-            <a
-              href={product.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block"
-            >
-              <h3 className="text-xl font-semibold text-primary">
-                {product.title}
-              </h3>
-            </a>
-            {/* <div className="flex items-center gap-2 mt-2 text-sm text-gray-500 dark:text-gray-400">
-              <Gift className="w-4 h-4" />
-              <span>Perfect for {product.keywords[0]}</span>
-            </div> */}
-          </div>
+        {/* Header: Title and Buy Button - Hidden on Mobile */}
+        <div className="hidden sm:flex items-start justify-between gap-4 mb-4">
+          <h3 className="text-xl font-semibold text-primary">
+            {product.title}
+          </h3>
 
-          {/* Amazon Button */}
+          {/* Desktop/Tablet Amazon Button */}
           <motion.a
             href={product.link}
             target="_blank"
@@ -60,7 +47,7 @@ export default function ProductCard({ product, index }) {
             }}
           >
             {/* Gradient Glow */}
-            <div className="absolute -inset-1 rounded-lg  opacity-70 blur-lg transition-all duration-300 group-hover:opacity-100" />
+            <div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 opacity-70 blur-lg transition-all duration-300 group-hover:opacity-100" />
             {/* Button */}
             <div className="relative flex items-center justify-center gap-2 px-4 py-2 font-bold text-white bg-gradient-to-br from-yellow-500 to-orange-600 rounded-lg leading-none shadow-md hover:shadow-lg">
               <span className="font-semibold text-sm whitespace-nowrap">
@@ -68,6 +55,13 @@ export default function ProductCard({ product, index }) {
               </span>
             </div>
           </motion.a>
+        </div>
+
+        {/* Mobile Title - Shown only on Mobile */}
+        <div className="sm:hidden mb-4">
+          <h3 className="text-xl font-semibold text-primary">
+            {product.title}
+          </h3>
         </div>
 
         {/* Description */}
@@ -104,6 +98,27 @@ export default function ProductCard({ product, index }) {
           ))}
         </div>
       </div>
+
+      {/* Mobile Amazon Button - Shown only on Mobile */}
+      <motion.a
+        href={product.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="sm:hidden w-full mt-auto"
+        whileHover="hover"
+        onClick={handleAmazonClick}
+        whileTap="tap"
+        initial="rest"
+        variants={{
+          rest: { scale: 1 },
+          hover: { scale: 1.02 },
+          tap: { scale: 0.98 },
+        }}
+      >
+        <div className="relative flex items-center justify-center gap-2 py-4 font-bold text-white bg-gradient-to-br from-yellow-500 to-orange-600 leading-none">
+          <span className="font-semibold">Buy on Amazon</span>
+        </div>
+      </motion.a>
     </motion.div>
   );
 }
