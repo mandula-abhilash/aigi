@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ExternalLink, Gift, Tag } from "lucide-react";
+import { Gift, Tag } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useAnalytics } from "@/hooks/use-analytics";
 
@@ -23,46 +23,11 @@ export default function ProductCard({ product, index }) {
       transition={{ delay: index * 0.1 }}
       className="bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 flex flex-col"
     >
-      <div className="p-6">
-        {/* Header: Title and Buy Button - Hidden on Mobile */}
-        <div className="hidden sm:flex items-start justify-between gap-4 mb-4">
-          <h3 className="text-xl font-semibold text-primary">
-            {product.title}
-          </h3>
-
-          {/* Desktop/Tablet Amazon Button */}
-          <motion.a
-            href={product.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="relative inline-flex group shrink-0"
-            whileHover="hover"
-            onClick={handleAmazonClick}
-            whileTap="tap"
-            initial="rest"
-            variants={{
-              rest: { scale: 1 },
-              hover: { scale: 1.05 },
-              tap: { scale: 0.95 },
-            }}
-          >
-            {/* Gradient Glow */}
-            <div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 opacity-70 blur-lg transition-all duration-300 group-hover:opacity-100" />
-            {/* Button */}
-            <div className="relative flex items-center justify-center gap-2 px-4 py-2 font-bold text-white bg-gradient-to-br from-yellow-500 to-orange-600 rounded-lg leading-none shadow-md hover:shadow-lg">
-              <span className="font-semibold text-sm whitespace-nowrap">
-                Buy on Amazon
-              </span>
-            </div>
-          </motion.a>
-        </div>
-
-        {/* Mobile Title - Shown only on Mobile */}
-        <div className="sm:hidden mb-4">
-          <h3 className="text-xl font-semibold text-primary">
-            {product.title}
-          </h3>
-        </div>
+      <div className="p-6 flex-1">
+        {/* Title */}
+        <h3 className="text-xl font-semibold text-primary mb-4">
+          {product.title}
+        </h3>
 
         {/* Description */}
         <div className="mb-4">
@@ -84,22 +49,53 @@ export default function ProductCard({ product, index }) {
           </div>
         )}
 
-        {/* Tags */}
-        <div className="flex flex-wrap items-center gap-2">
-          <Tag className="w-4 h-4 text-primary/60" />
-          {product.keywords.map((keyword, i) => (
-            <Badge
-              key={i}
-              variant="secondary"
-              className="bg-primary/5 text-primary hover:bg-primary/10 transition-colors text-sm px-2.5 py-0.5"
+        {/* Tags and Buy Button Container */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
+          {/* Tags */}
+          <div className="flex flex-wrap items-center gap-2">
+            <Tag className="w-4 h-4 text-primary/60" />
+            {product.keywords.map((keyword, i) => (
+              <Badge
+                key={i}
+                variant="secondary"
+                className="bg-primary/5 text-primary hover:bg-primary/10 transition-colors text-sm px-2.5 py-0.5"
+              >
+                {keyword}
+              </Badge>
+            ))}
+          </div>
+
+          {/* Desktop/Tablet Amazon Button */}
+          <div className="hidden sm:block">
+            <motion.a
+              href={product.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative inline-flex group"
+              whileHover="hover"
+              onClick={handleAmazonClick}
+              whileTap="tap"
+              initial="rest"
+              variants={{
+                rest: { scale: 1 },
+                hover: { scale: 1.05 },
+                tap: { scale: 0.95 },
+              }}
             >
-              {keyword}
-            </Badge>
-          ))}
+              {/* Gradient Glow */}
+              <div className="absolute -inset-1 rounded-lg opacity-70 blur-lg transition-all duration-300 group-hover:opacity-100" />
+              {/* Button */}
+              <div className="relative flex items-center justify-center gap-2 px-4 py-2 font-bold text-white bg-gradient-to-br from-yellow-500 to-orange-600 rounded-lg leading-none shadow-md hover:shadow-lg">
+                <span className="font-semibold text-sm whitespace-nowrap">
+                  Buy on Amazon
+                </span>
+              </div>
+            </motion.a>
+          </div>
         </div>
       </div>
 
-      {/* Mobile Amazon Button - Shown only on Mobile */}
+      {/* Mobile Amazon Button */}
       <motion.a
         href={product.link}
         target="_blank"
