@@ -69,7 +69,7 @@ export default function GiftCard({ suggestion, index }) {
             }}
           >
             {/* Gradient Glow */}
-            <div className="absolute -inset-1 rounded-lg bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 opacity-70 blur-lg transition-all duration-300 group-hover:opacity-100" />
+            <div className="absolute -inset-1 rounded-lg opacity-70 blur-lg transition-all duration-300 group-hover:opacity-100" />
             {/* Button */}
             <div className="relative w-full flex items-center justify-center gap-2 px-6 py-3 font-bold text-white bg-gradient-to-br from-yellow-500 to-orange-600 rounded-lg leading-none shadow-md hover:shadow-lg">
               <span className="font-semibold text-sm">Buy on Amazon</span>
