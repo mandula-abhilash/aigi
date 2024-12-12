@@ -6,7 +6,7 @@ import HeroPills from "./hero/HeroPills";
 
 export default function HeroSection() {
   return (
-    <section className="relative py-14 overflow-hidden">
+    <section className="min-h-[calc(100vh)] flex flex-col justify-center relative pt-14 pb-32 overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-background" />
 
@@ -38,7 +38,7 @@ export default function HeroSection() {
         />
       </div>
 
-      <div className="relative mx-auto px-4 max-w-6xl">
+      <div className="relative mx-auto px-4 max-w-6xl flex-1 flex flex-col justify-center">
         <div className="text-center max-w-3xl mx-auto">
           {/* Main Tagline */}
           <motion.div
