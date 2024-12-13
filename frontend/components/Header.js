@@ -38,7 +38,7 @@ export default function Header() {
 
   return (
     <header className="bg-white dark:bg-gray-800 shadow-sm">
-      <div className="mx-auto px-4 py-4">
+      <div className="mx-auto px-4 py-2">
         <div className="flex items-center justify-between">
           <Link
             href="/"

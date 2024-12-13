@@ -7,22 +7,30 @@ import geoip from "geoip-lite";
  */
 export const getLocationDetails = async (req, res) => {
   try {
-    console.log(req.headers["x-forwarded-for"]);
+    console.log("X-Forwarded-For:", req.headers["x-forwarded-for"]);
+    console.log("X-Real-IP:", req.headers["x-real-ip"]);
 
-    // Get IP from request object
-    const ip =
+    // Prioritizing in this order:
+    // 1. X-Forwarded-For (first IP if multiple)
+    // 2. X-Real-IP
+    // 3. req.ip (trust proxy should be true)
+    // 4. req.connection.remoteAddress
+    let clientIp =
+      req.headers["x-forwarded-for"]?.split(",")[0]?.trim() ||
+      req.headers["x-real-ip"] ||
       req.ip ||
-      req.connection.remoteAddress ||
-      req.headers["x-forwarded-for"]?.split(",")[0];
+      req.connection.remoteAddress;
 
-    if (!ip) {
-      return res.status(400).json({
-        error: "Could not detect IP address",
-      });
+    if (!clientIp) {
+      // Fallback to a known IP if no IP is detected
+      console.warn(
+        "No IP detected from headers or request. Using fallback IP: 8.8.8.8."
+      );
+      clientIp = "8.8.8.8";
     }
 
     // Clean the IP address (remove IPv6 prefix if present)
-    const cleanIp = ip.replace(/^::ffff:/, "");
+    const cleanIp = clientIp.replace(/^::ffff:/, "");
 
     // Handle localhost/development IPs
     if (cleanIp === "127.0.0.1" || cleanIp === "::1") {
@@ -35,10 +43,11 @@ export const getLocationDetails = async (req, res) => {
       });
     }
 
-    // Look up location using geoip-lite
+    // Perform geo lookup
     const geo = geoip.lookup(cleanIp);
 
     if (!geo) {
+      // If no geo data found, return default or "Unknown"
       return res.status(200).json({
         country: "US",
         region: "Unknown",
@@ -48,7 +57,8 @@ export const getLocationDetails = async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    // Successfully found geo data
+    return res.status(200).json({
       country: geo.country,
       region: geo.region,
       city: geo.city,
@@ -58,7 +68,7 @@ export const getLocationDetails = async (req, res) => {
   } catch (error) {
     console.error("Error getting location details:", error);
     // Return a default response instead of an error
-    res.status(200).json({
+    return res.status(200).json({
       country: "US",
       region: "Unknown",
       city: "Unknown",
