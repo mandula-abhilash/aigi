@@ -7,11 +7,17 @@ import geoip from "geoip-lite";
  */
 export const getLocationDetails = async (req, res) => {
   try {
-    const ip = req.query.ip;
+    console.log(req.headers["x-forwarded-for"]);
+
+    // Get IP from request object
+    const ip =
+      req.ip ||
+      req.connection.remoteAddress ||
+      req.headers["x-forwarded-for"]?.split(",")[0];
 
     if (!ip) {
       return res.status(400).json({
-        error: "IP address is required",
+        error: "Could not detect IP address",
       });
     }
 
@@ -25,6 +31,7 @@ export const getLocationDetails = async (req, res) => {
         region: "Development",
         city: "Local",
         timezone: "America/New_York",
+        ip: cleanIp,
       });
     }
 
@@ -37,6 +44,7 @@ export const getLocationDetails = async (req, res) => {
         region: "Unknown",
         city: "Unknown",
         timezone: "America/New_York",
+        ip: cleanIp,
       });
     }
 
@@ -45,6 +53,7 @@ export const getLocationDetails = async (req, res) => {
       region: geo.region,
       city: geo.city,
       timezone: geo.timezone,
+      ip: cleanIp,
     });
   } catch (error) {
     console.error("Error getting location details:", error);
@@ -54,6 +63,7 @@ export const getLocationDetails = async (req, res) => {
       region: "Unknown",
       city: "Unknown",
       timezone: "America/New_York",
+      ip: "unknown",
     });
   }
 };

@@ -1,30 +1,12 @@
 import axios from "axios";
 
 /**
- * Get user's IP address from ipify client-side
- * @returns {Promise<string|null>} IP address or null if failed
+ * Get user's location data from backend
+ * @returns {Promise<Object>} Location data with country code and IP
  */
-export async function getPublicIp() {
+export async function getLocationFromIp() {
   try {
-    const { data } = await axios.get("https://api.ipify.org?format=json");
-    console.log(`getPublicIp : ${data}`);
-    return data.ip;
-  } catch (error) {
-    console.error("Failed to get public IP:", error);
-    return null;
-  }
-}
-
-/**
- * Get user's location data from backend using IP
- * @param {string} ip - User's IP address
- * @returns {Promise<Object>} Location data with country code
- */
-export async function getLocationFromIp(ip) {
-  try {
-    const { data: location } = await axios.get("/api/geo/location", {
-      params: { ip },
-    });
+    const { data: location } = await axios.get("/api/geo/location");
 
     if (!location?.country) {
       throw new Error("Invalid location data received");
@@ -34,13 +16,15 @@ export async function getLocationFromIp(ip) {
       countryCode: location.country,
       region: location.region,
       city: location.city,
+      ip: location.ip,
     };
   } catch (error) {
-    console.error("Failed to get location from IP:", error);
+    console.error("Failed to get location:", error);
     return {
       countryCode: "US", // Default to US
       region: null,
       city: null,
+      ip: null,
     };
   }
 }

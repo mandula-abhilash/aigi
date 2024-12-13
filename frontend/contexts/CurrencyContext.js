@@ -53,15 +53,14 @@ export function CurrencyProvider({ children }) {
   const detectUserLocation = async () => {
     try {
       const storedData = getStoredMarketplaceData();
-      const currentIp = await getPublicIp();
+      const location = await getLocationFromIp();
 
-      if (!currentIp) {
-        throw new Error("Could not detect IP address");
+      if (!location.ip) {
+        throw new Error("Could not detect location");
       }
 
-      if (!storedData || storedData.userIp !== currentIp) {
-        const location = await getLocationFromIp(currentIp);
-        updateCurrencyState(location.countryCode, currentIp);
+      if (!storedData || storedData.userIp !== location.ip) {
+        updateCurrencyState(location.countryCode, location.ip);
         setShowCurrencyModal(true);
       } else {
         setCurrency(storedData.currencyCode);
@@ -77,7 +76,6 @@ export function CurrencyProvider({ children }) {
       setIsInitialized(true);
     }
   };
-
   useEffect(() => {
     detectUserLocation();
   }, []);
