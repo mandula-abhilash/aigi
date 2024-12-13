@@ -1,10 +1,8 @@
 import axios from "axios";
+import geoip from "geoip-lite";
 
 /**
- * Controller to fetch the user's public IP address.
- * @param {Object} req - Express request object.
- * @param {Object} res - Express response object.
- * @returns {void} Sends the IP address in JSON format.
+ * Controller to fetch the user's public IP address using ipify
  */
 export const getIpAddress = async (req, res) => {
   try {
@@ -12,22 +10,34 @@ export const getIpAddress = async (req, res) => {
     res.status(200).json(response.data);
   } catch (error) {
     console.error("Error fetching IP address:", error.message);
-    res.status(500).json({ error: "Failed to fetch IP address." });
+    res.status(500).json({ error: "Failed to fetch IP address" });
   }
 };
 
 /**
- * Controller to fetch location details based on the user's IP address.
- * @param {Object} req - Express request object.
- * @param {Object} res - Express response object.
- * @returns {void} Sends the location details in JSON format.
+ * Controller to get location details based on IP address using geoip-lite
  */
 export const getLocationDetails = async (req, res) => {
   try {
-    const response = await axios.get("https://lumtest.com/myip.json");
-    res.status(200).json(response.data);
+    // Get IP from query params or from request
+    const ip = req.query.ip || req.ip;
+
+    // Look up location
+    const geo = geoip.lookup(ip);
+
+    if (!geo) {
+      throw new Error("Location not found");
+    }
+
+    res.status(200).json({
+      ip,
+      country: geo.country,
+      region: geo.region,
+      city: geo.city,
+      timezone: geo.timezone,
+    });
   } catch (error) {
     console.error("Error fetching location details:", error.message);
-    res.status(500).json({ error: "Failed to fetch location details." });
+    res.status(500).json({ error: "Failed to fetch location details" });
   }
 };
