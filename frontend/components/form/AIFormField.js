@@ -50,11 +50,15 @@ export default function AIFormField({
 }) {
   const [isFocused, setIsFocused] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestionsFetched, setSuggestionsFetched] = useState(false);
 
   useEffect(() => {
     setShowSuggestions(
       isFocused && (loading || suggestions.length > 0 || value)
     );
+    if (!loading && suggestions.length > 0) {
+      setSuggestionsFetched(true);
+    }
   }, [isFocused, loading, suggestions.length, value]);
 
   const handleSuggestionClick = (suggestion) => {
@@ -81,6 +85,7 @@ export default function AIFormField({
             "bg-transparent transition-colors",
             !value && "text-transparent"
           )}
+          autoComplete="off"
           {...props}
         />
 
@@ -101,7 +106,8 @@ export default function AIFormField({
               </div>
             ) : (
               <div className="max-h-60 overflow-y-auto">
-                {value &&
+                {suggestionsFetched &&
+                  value &&
                   !suggestions.some(
                     (s) => s.toLowerCase() === value.toLowerCase()
                   ) && (
