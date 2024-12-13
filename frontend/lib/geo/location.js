@@ -7,6 +7,7 @@ import axios from "axios";
 export async function getPublicIp() {
   try {
     const { data } = await axios.get("https://api.ipify.org?format=json");
+    console.log(`getPublicIp : ${data}`);
     return data.ip;
   } catch (error) {
     console.error("Failed to get public IP:", error);
