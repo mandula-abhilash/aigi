@@ -2,6 +2,7 @@ import axios from "axios";
 
 /**
  * Get user's IP address from ipify
+ * @returns {Promise<string|null>} IP address or null if failed
  */
 async function getPublicIp() {
   try {
@@ -14,46 +15,58 @@ async function getPublicIp() {
 }
 
 /**
- * Get user's country from IP address
+ * Get user's location data
+ * @returns {Promise<Object>} Location data with country, region, and city
  */
 export async function getUserLocation() {
   try {
-    // First try getting location from localStorage
+    // Check localStorage first
     const storedLocation = localStorage.getItem("userLocation");
     if (storedLocation) {
-      return JSON.parse(storedLocation);
+      const parsed = JSON.parse(storedLocation);
+      const storedTime = localStorage.getItem("userLocationTime");
+
+      // Only use stored location if it's less than 24 hours old
+      if (
+        storedTime &&
+        Date.now() - parseInt(storedTime) < 24 * 60 * 60 * 1000
+      ) {
+        return parsed;
+      }
     }
 
     // Get public IP from client side
     const userIp = await getPublicIp();
-
     if (!userIp) {
       throw new Error("Failed to get IP address");
     }
 
-    // Get location details from backend using the IP
-    const response = await axios.get(`/api/geo/location?ip=${userIp}`);
-    const location = response.data;
+    // Get location details from backend
+    const { data: location } = await axios.get("/api/geo/location", {
+      params: { ip: userIp },
+    });
 
-    // Store in localStorage to prevent frequent API calls
+    // Store in localStorage with timestamp
     if (location?.country) {
-      localStorage.setItem(
-        "userLocation",
-        JSON.stringify({
-          country: location.country,
-          region: location.region,
-          city: location.city,
-        })
-      );
+      const locationData = {
+        country: location.country,
+        region: location.region,
+        city: location.city,
+      };
+
+      localStorage.setItem("userLocation", JSON.stringify(locationData));
+      localStorage.setItem("userLocationTime", Date.now().toString());
+
+      return locationData;
     }
 
-    return {
-      country: location?.country || "US",
-      region: location?.region,
-      city: location?.city,
-    };
+    throw new Error("Invalid location data received");
   } catch (error) {
     console.error("Failed to detect location:", error);
-    return { country: "US", region: null, city: null }; // Default to US
+    return {
+      country: "US",
+      region: null,
+      city: null,
+    };
   }
 }

@@ -1,30 +1,17 @@
 import express from "express";
-import {
-  getIpAddress,
-  getLocationDetails,
-} from "../controllers/geo.controller.js";
+import { getLocationDetails } from "../controllers/geo.controller.js";
 
 const router = express.Router();
 
 /**
- * Route to fetch the user's public IP address.
- * @method GET
- * @route /api/geo/ip
- * @returns {Object} IP address in JSON format.
- * @example
- * GET /api/geo/ip
- * Response: { "ip": "123.45.67.89" }
- */
-router.get("/ip", getIpAddress);
-
-/**
- * Route to fetch location details based on the user's IP address.
+ * Route to fetch location details based on IP address
  * @method GET
  * @route /api/geo/location
- * @returns {Object} Location details in JSON format.
+ * @param {string} ip - IP address to lookup
+ * @returns {Object} Location details in JSON format
  * @example
- * GET /api/geo/location
- * Response: { "ip": "123.45.67.89", "country": "United States" }
+ * GET /api/geo/location?ip=123.45.67.89
+ * Response: { country: "US", region: "CA", city: "San Francisco" }
  */
 router.get("/location", getLocationDetails);
 
