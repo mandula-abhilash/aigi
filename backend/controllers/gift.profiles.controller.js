@@ -63,11 +63,28 @@ export const addProductToProfile = async (req, res) => {
 };
 
 /**
- * Get all gift profiles
+ * Get all gift profiles with search and sort functionality
  */
 export const getGiftProfiles = async (req, res) => {
   try {
-    const giftProfiles = await GiftProfileModel.find();
+    const { search } = req.query;
+    let query = {};
+
+    if (search) {
+      const searchRegex = new RegExp(search, "i");
+      query = {
+        $or: [
+          { title: searchRegex },
+          { description: searchRegex },
+          { interests: searchRegex },
+        ],
+      };
+    }
+
+    const giftProfiles = await GiftProfileModel.find(query).sort({
+      createdAt: -1,
+    }); // Sort by most recent first
+
     res.status(200).json(giftProfiles);
   } catch (error) {
     console.error("Error fetching gift profiles:", error.message);

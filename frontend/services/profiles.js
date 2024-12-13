@@ -1,12 +1,15 @@
 import api from "./api";
 
 /**
- * Fetch all gift profiles
+ * Fetch all gift profiles with optional search
+ * @param {string} search - Optional search term
  * @returns {Promise<Array>} Array of gift profiles
  */
-export async function getGiftProfiles() {
+export async function getGiftProfiles(search = "") {
   try {
-    const response = await api.get("/api/gift-profiles");
+    const response = await api.get("/api/gift-profiles", {
+      params: { search },
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching gift profiles:", error);

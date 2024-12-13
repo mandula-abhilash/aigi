@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { getGiftProfiles } from "@/services/profiles";
 import ProfileGrid from "@/components/profiles/ProfileGrid";
-import SearchFilters from "@/components/profiles/SearchFilters";
 import AddGiftProfileButton from "@/components/profiles/AddGiftProfileButton";
 
 // Disable static rendering and cache
@@ -29,8 +28,7 @@ export default async function ProfilesPage() {
           </p>
         </div>
 
-        <div className="flex justify-between items-start mb-8">
-          <SearchFilters />
+        <div className="flex justify-end mb-8">
           <AddGiftProfileButton />
         </div>
 
