@@ -1,10 +1,10 @@
 import axios from "axios";
 
 /**
- * Get user's IP address from ipify
+ * Get user's IP address from ipify client-side
  * @returns {Promise<string|null>} IP address or null if failed
  */
-async function getPublicIp() {
+export async function getPublicIp() {
   try {
     const { data } = await axios.get("https://api.ipify.org?format=json");
     return data.ip;
@@ -15,56 +15,29 @@ async function getPublicIp() {
 }
 
 /**
- * Get user's location data
- * @returns {Promise<Object>} Location data with country, region, and city
+ * Get user's location data from backend using IP
+ * @param {string} ip - User's IP address
+ * @returns {Promise<Object>} Location data with country code
  */
-export async function getUserLocation() {
+export async function getLocationFromIp(ip) {
   try {
-    // Check localStorage first
-    const storedLocation = localStorage.getItem("userLocation");
-    if (storedLocation) {
-      const parsed = JSON.parse(storedLocation);
-      const storedTime = localStorage.getItem("userLocationTime");
-
-      // Only use stored location if it's less than 24 hours old
-      if (
-        storedTime &&
-        Date.now() - parseInt(storedTime) < 24 * 60 * 60 * 1000
-      ) {
-        return parsed;
-      }
-    }
-
-    // Get public IP from client side
-    const userIp = await getPublicIp();
-    if (!userIp) {
-      throw new Error("Failed to get IP address");
-    }
-
-    // Get location details from backend
     const { data: location } = await axios.get("/api/geo/location", {
-      params: { ip: userIp },
+      params: { ip },
     });
 
-    // Store in localStorage with timestamp
-    if (location?.country) {
-      const locationData = {
-        country: location.country,
-        region: location.region,
-        city: location.city,
-      };
-
-      localStorage.setItem("userLocation", JSON.stringify(locationData));
-      localStorage.setItem("userLocationTime", Date.now().toString());
-
-      return locationData;
+    if (!location?.country) {
+      throw new Error("Invalid location data received");
     }
 
-    throw new Error("Invalid location data received");
-  } catch (error) {
-    console.error("Failed to detect location:", error);
     return {
-      country: "US",
+      countryCode: location.country,
+      region: location.region,
+      city: location.city,
+    };
+  } catch (error) {
+    console.error("Failed to get location from IP:", error);
+    return {
+      countryCode: "US", // Default to US
       region: null,
       city: null,
     };

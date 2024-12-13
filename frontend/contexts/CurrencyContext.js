@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
-import { getIpAddress, getLocationDetails } from "@/services/api";
+import { getPublicIp, getLocationFromIp } from "@/lib/geo/location";
 import {
   currencyMap,
   getMarketplaceData,
@@ -53,13 +53,15 @@ export function CurrencyProvider({ children }) {
   const detectUserLocation = async () => {
     try {
       const storedData = getStoredMarketplaceData();
-      const ipData = await getIpAddress();
-      const currentIp = ipData.ip;
+      const currentIp = await getPublicIp();
+
+      if (!currentIp) {
+        throw new Error("Could not detect IP address");
+      }
 
       if (!storedData || storedData.userIp !== currentIp) {
-        const locationData = await getLocationDetails();
-        const countryCode = locationData.country;
-        updateCurrencyState(countryCode, currentIp);
+        const location = await getLocationFromIp(currentIp);
+        updateCurrencyState(location.countryCode, currentIp);
         setShowCurrencyModal(true);
       } else {
         setCurrency(storedData.currencyCode);
@@ -88,29 +90,13 @@ export function CurrencyProvider({ children }) {
       );
 
       if (countryCode) {
-        const marketplaceData = getMarketplaceData(countryCode);
-        const currencyData = getCurrencyData(countryCode);
-
-        setCurrency(currencyData.code);
-        setCurrencySymbol(currencyData.symbol);
-        setMarketplace(marketplaceData.marketplace);
-
-        const data = {
-          countryCode,
-          marketplace: marketplaceData.marketplace,
-          currencyCode: currencyData.code,
-          currencySymbol: currencyData.symbol,
-          userIp,
-        };
-
-        storeMarketplaceData(data);
+        updateCurrencyState(countryCode, userIp);
       }
     },
-
     showCurrencyModal,
     setShowCurrencyModal,
     currencySymbol,
-    currencyMap: getCurrencyData(),
+    currencyMap,
     isInitialized,
     userIp,
     marketplace,

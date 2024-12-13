@@ -4,7 +4,6 @@ import api from "./axiosInstance";
 const ENDPOINTS = {
   FIELD_SUGGESTIONS: "/api/suggestions/fields",
   GIFT_SUGGESTIONS: "/api/suggestions/gifts",
-  GEO_IP: "/api/geo/ip",
   GEO_LOCATION: "/api/geo/location",
 };
 
@@ -56,27 +55,12 @@ export const getGiftSuggestions = async (formData) => {
   }
 };
 
-// Wrapper for getting the user's IP address
-export const getIpAddress = async () => {
+// Wrapper for getting location details from IP
+export const getLocationDetails = async (ip) => {
   try {
-    const response = await api.get(ENDPOINTS.GEO_IP);
-    return response.data;
-  } catch (error) {
-    if (error.response) {
-      console.error("Error fetching IP address (API):", error.response.data);
-    } else if (error.request) {
-      console.error("Error fetching IP address (Network):", error.message);
-    } else {
-      console.error("Error fetching IP address (Other):", error.message);
-    }
-    throw new Error("Failed to fetch IP address");
-  }
-};
-
-// Wrapper for getting location details
-export const getLocationDetails = async () => {
-  try {
-    const response = await api.get(ENDPOINTS.GEO_LOCATION);
+    const response = await api.get(ENDPOINTS.GEO_LOCATION, {
+      params: { ip },
+    });
     return response.data;
   } catch (error) {
     if (error.response) {
