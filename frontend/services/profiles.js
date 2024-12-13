@@ -1,16 +1,31 @@
 import api from "./api";
 
 /**
- * Fetch all gift profiles with optional search
- * @param {string} search - Optional search term
- * @returns {Promise<Array>} Array of gift profiles
+ * Fetch gift profiles with pagination and search
+ * @param {Object} params - Query parameters
+ * @param {string} params.search - Search term
+ * @param {number} params.page - Page number
+ * @param {number} params.limit - Items per page
+ * @returns {Promise<Object>} Paginated gift profiles
  */
-export async function getGiftProfiles(search = "") {
+export async function getGiftProfiles(params = {}) {
   try {
     const response = await api.get("/api/gift-profiles", {
-      params: { search },
+      params: {
+        search: params.search || "",
+        page: params.page || 1,
+        limit: params.limit || 10,
+      },
     });
-    return response.data;
+
+    // Ensure we always return a properly structured response
+    return {
+      profiles: response.data?.profiles || [],
+      hasMore: response.data?.hasMore || false,
+      total: response.data?.total || 0,
+      page: response.data?.page || 1,
+      totalPages: response.data?.totalPages || 1,
+    };
   } catch (error) {
     console.error("Error fetching gift profiles:", error);
     throw new Error(

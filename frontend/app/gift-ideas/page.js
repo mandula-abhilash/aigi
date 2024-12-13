@@ -2,21 +2,32 @@ import { Suspense } from "react";
 import { getGiftProfiles } from "@/services/profiles";
 import ProfileGrid from "@/components/profiles/ProfileGrid";
 import AddGiftProfileButton from "@/components/profiles/AddGiftProfileButton";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 // Disable static rendering and cache
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-function LoadingSpinner() {
-  return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-    </div>
-  );
+async function getInitialProfiles() {
+  try {
+    const data = await getGiftProfiles({ page: 1, limit: 10 });
+    return {
+      profiles: data.profiles || [],
+      hasMore: data.hasMore || false,
+      total: data.total || 0,
+    };
+  } catch (error) {
+    console.error("Error fetching initial profiles:", error);
+    return {
+      profiles: [],
+      hasMore: false,
+      total: 0,
+    };
+  }
 }
 
 export default async function ProfilesPage() {
-  const initialProfiles = await getGiftProfiles();
+  const initialData = await getInitialProfiles();
 
   return (
     <div className="mx-auto px-4 py-8">
@@ -33,7 +44,7 @@ export default async function ProfilesPage() {
         </div>
 
         <Suspense fallback={<LoadingSpinner />}>
-          <ProfileGrid initialProfiles={initialProfiles} />
+          <ProfileGrid initialData={initialData} />
         </Suspense>
       </div>
     </div>

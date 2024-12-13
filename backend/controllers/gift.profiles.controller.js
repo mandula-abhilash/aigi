@@ -67,7 +67,10 @@ export const addProductToProfile = async (req, res) => {
  */
 export const getGiftProfiles = async (req, res) => {
   try {
-    const { search } = req.query;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search || "";
+
     let query = {};
 
     if (search) {
@@ -81,11 +84,25 @@ export const getGiftProfiles = async (req, res) => {
       };
     }
 
-    const giftProfiles = await GiftProfileModel.find(query).sort({
-      createdAt: -1,
-    }); // Sort by most recent first
+    // Get total count for pagination
+    const total = await GiftProfileModel.countDocuments(query);
 
-    res.status(200).json(giftProfiles);
+    // Get paginated results
+    const profiles = await GiftProfileModel.find(query)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    // Calculate if there are more pages
+    const hasMore = total > page * limit;
+
+    res.status(200).json({
+      profiles,
+      hasMore,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (error) {
     console.error("Error fetching gift profiles:", error.message);
     res.status(500).json({ error: "Failed to fetch gift profiles" });
