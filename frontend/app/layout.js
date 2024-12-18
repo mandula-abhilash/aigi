@@ -4,77 +4,22 @@ import Providers from "@/components/Providers";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Toaster } from "@/components/ui/toaster";
+import {
+  siteMetadata,
+  openGraphMetadata,
+  twitterMetadata,
+  robotsMetadata,
+  verificationMetadata,
+} from "@/lib/config/metadata";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL || "https://aigi.visdak.com"
-  ),
-  title: {
-    default: "AIGI - Perfect Gift Every Time",
-    template: "%s | AIGI Gift Finder",
-  },
-  description:
-    "Find the perfect gift for your loved ones using AI-powered recommendations. Our intelligent gift finder helps you discover thoughtful and personalized gifts for any occasion.",
-  keywords: [
-    "gift finder",
-    "AI recommendations",
-    "gift ideas",
-    "personalized gifts",
-    "gift suggestions",
-    "perfect gift",
-    "gift recommendations",
-    "AI gift finder",
-    "gift guide",
-    "gift inspiration",
-  ],
-  authors: [{ name: "VISDAK" }],
-  creator: "VISDAK",
-  publisher: "VISDAK",
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
-  },
-  alternates: {
-    canonical: process.env.NEXT_PUBLIC_APP_URL,
-  },
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: process.env.NEXT_PUBLIC_APP_URL || "https://aigi.visdak.com",
-    siteName: "AIGI Gift Finder",
-    title: "AIGI - Perfect Gift Every Time",
-    description:
-      "Find the perfect gift for your loved ones using AI-powered recommendations. Our intelligent gift finder helps you discover thoughtful and personalized gifts for any occasion.",
-    images: [
-      {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "AIGI Gift Finder",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "AIGI - Perfect Gift Every Time",
-    description:
-      "Find the perfect gift for your loved ones using AI-powered recommendations. Our intelligent gift finder helps you discover thoughtful and personalized gifts for any occasion.",
-    images: ["/og-image.jpg"],
-    creator: "@visdak",
-  },
-  // verification: {
-  //   google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
-  //   bing: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION,
-  // },
+  ...siteMetadata,
+  openGraph: openGraphMetadata,
+  twitter: twitterMetadata,
+  robots: robotsMetadata,
+  verification: verificationMetadata,
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon-16x16.png",
@@ -102,6 +47,23 @@ export default function RootLayout({ children }) {
         />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/site.webmanifest" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "VISDAK",
+              url: process.env.NEXT_PUBLIC_APP_URL,
+              logo: `${process.env.NEXT_PUBLIC_APP_URL}/logo.png`,
+              sameAs: [
+                "https://www.instagram.com/visdak_official/",
+                "https://x.com/visdak_official",
+                "https://www.pinterest.com/visdak_official/",
+              ],
+            }),
+          }}
+        />
       </head>
       <body className={inter.className}>
         <Providers>

@@ -1,7 +1,9 @@
 import { getGiftProfiles } from "@/services/profiles";
+import { seoConfig } from "@/lib/config/seo";
 
 export default async function sitemap() {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://aigi.visdak.com";
+  const { changeFrequency, priority } = seoConfig.sitemap;
 
   // Static routes
   const staticRoutes = [
@@ -14,8 +16,9 @@ export default async function sitemap() {
   ].map((route) => ({
     url: `${baseUrl}/${route}`,
     lastModified: new Date(),
-    changeFrequency: "daily",
-    priority: route === "" ? 1.0 : 0.8,
+    changeFrequency:
+      route === "" ? changeFrequency.home : changeFrequency.static,
+    priority: route === "" ? priority.home : priority.static,
   }));
 
   // Dynamic routes - Gift profiles
@@ -25,8 +28,8 @@ export default async function sitemap() {
     giftProfileRoutes = profiles.map((profile) => ({
       url: `${baseUrl}/gift-ideas/${profile.slug}`,
       lastModified: profile.updatedAt || new Date(),
-      changeFrequency: "weekly",
-      priority: 0.7,
+      changeFrequency: changeFrequency.giftProfiles,
+      priority: priority.giftProfiles,
     }));
   } catch (error) {
     console.error("Error generating sitemap for gift profiles:", error);
