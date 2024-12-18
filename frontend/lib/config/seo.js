@@ -10,8 +10,8 @@ export const seoConfig = {
     },
     priority: {
       home: 1.0,
-      giftProfiles: 0.7,
-      static: 0.5,
+      giftProfiles: 0.8,
+      static: 0.6,
     },
   },
 
