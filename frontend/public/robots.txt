@@ -1,3 +1,4 @@
+# Allow all crawlers
 User-agent: *
 Allow: /
 Allow: /gift-ideas
@@ -6,6 +7,9 @@ Allow: /about
 Allow: /privacy-policy
 Allow: /terms
 
+# Specify the host
+Host: ${process.env.NEXT_PUBLIC_APP_URL}
+
 # Disallow admin and auth pages
 Disallow: /admin
 Disallow: /login
@@ -13,4 +17,4 @@ Disallow: /register
 Disallow: /vamsharaj
 
 # Sitemaps
-Sitemap: https://aigi.visdak.com/sitemap.xml
+Sitemap: ${process.env.NEXT_PUBLIC_APP_URL}/sitemap.xml

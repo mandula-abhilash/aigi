@@ -29,7 +29,24 @@ const nextConfig = {
     ],
     domains: ["images.pexels.com"],
   },
-  // Enable dynamic content handling
+  // Add headers configuration
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "X-Robots-Tag",
+            value: "index, follow",
+          },
+          {
+            key: "Link",
+            value: `<${process.env.NEXT_PUBLIC_APP_URL}>; rel="canonical"`,
+          },
+        ],
+      },
+    ];
+  },
   cleanDistDir: true,
   assetPrefix: "",
 };

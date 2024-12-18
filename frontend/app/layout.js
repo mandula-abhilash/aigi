@@ -26,6 +26,9 @@ export const metadata = {
     apple: "/apple-touch-icon.png",
   },
   manifest: "/site.webmanifest",
+  alternates: {
+    canonical: process.env.NEXT_PUBLIC_APP_URL,
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -47,6 +50,8 @@ export default function RootLayout({ children }) {
         />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/site.webmanifest" />
+        {/* Add canonical URL */}
+        <link rel="canonical" href={process.env.NEXT_PUBLIC_APP_URL} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
