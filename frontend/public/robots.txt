@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Allow: /gift-ideas
+Allow: /find-me-a-gift
+Allow: /about
+Allow: /privacy-policy
+Allow: /terms
+
+# Disallow admin and auth pages
+Disallow: /admin
+Disallow: /login
+Disallow: /register
+Disallow: /vamsharaj
+
+# Sitemaps
+Sitemap: https://aigi.visdak.com/sitemap.xml

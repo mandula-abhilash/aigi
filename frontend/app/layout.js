@@ -16,12 +16,18 @@ export const metadata = {
     template: "%s | AIGI Gift Finder",
   },
   description:
-    "Find the perfect gift for your loved ones using AI-powered recommendations",
+    "Find the perfect gift for your loved ones using AI-powered recommendations. Our intelligent gift finder helps you discover thoughtful and personalized gifts for any occasion.",
   keywords: [
     "gift finder",
     "AI recommendations",
     "gift ideas",
     "personalized gifts",
+    "gift suggestions",
+    "perfect gift",
+    "gift recommendations",
+    "AI gift finder",
+    "gift guide",
+    "gift inspiration",
   ],
   authors: [{ name: "VISDAK" }],
   creator: "VISDAK",
@@ -29,6 +35,16 @@ export const metadata = {
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: process.env.NEXT_PUBLIC_APP_URL,
   },
   openGraph: {
     type: "website",
@@ -37,7 +53,7 @@ export const metadata = {
     siteName: "AIGI Gift Finder",
     title: "AIGI - Perfect Gift Every Time",
     description:
-      "Find the perfect gift for your loved ones using AI-powered recommendations",
+      "Find the perfect gift for your loved ones using AI-powered recommendations. Our intelligent gift finder helps you discover thoughtful and personalized gifts for any occasion.",
     images: [
       {
         url: "/og-image.jpg",
@@ -51,10 +67,14 @@ export const metadata = {
     card: "summary_large_image",
     title: "AIGI - Perfect Gift Every Time",
     description:
-      "Find the perfect gift for your loved ones using AI-powered recommendations",
+      "Find the perfect gift for your loved ones using AI-powered recommendations. Our intelligent gift finder helps you discover thoughtful and personalized gifts for any occasion.",
     images: ["/og-image.jpg"],
     creator: "@visdak",
   },
+  // verification: {
+  //   google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  //   bing: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION,
+  // },
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon-16x16.png",
